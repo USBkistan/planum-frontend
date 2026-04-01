@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
 import { AuthForm } from './AuthForm';
+import { Navigate } from 'react-router';
 
 interface User {
     email: string;
@@ -55,15 +56,25 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-    const { isAuthenticated, login } = useAuth();
+    const { isAuthenticated } = useAuth();
 
     if (!isAuthenticated) {
-        return <AuthFormWrapper onLogin={login} />;
+        return <Navigate to="/login" replace />;
     }
 
     return <>{children}</>;
 };
 
-const AuthFormWrapper: React.FC<{ onLogin: (email: string) => void }> = ({ onLogin }) => {
-    return <AuthForm onAuthSuccess={onLogin} />;
+interface PublicRouteProps {
+    children: ReactNode;
+}
+
+export const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
+    const { isAuthenticated } = useAuth();
+
+    if (isAuthenticated) {
+        return <Navigate to="/" replace />;
+    }
+
+    return <>{children}</>;
 };
