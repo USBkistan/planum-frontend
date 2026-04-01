@@ -1,0 +1,134 @@
+.main-menu-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    overflow: hidden;
+}
+
+.main-menu-sidebar {
+    width: 250px;
+    min-width: 250px;
+    background-color: #1a1a2e;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    height: 100%;
+}
+
+.main-menu-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.main-menu-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.main-menu-logo {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.main-menu-user-email {
+    display: block;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 5px;
+}
+
+.main-menu-nav {
+    flex: 1;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.main-menu-nav-btn {
+    padding: 12px 20px;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.main-menu-nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.main-menu-nav-btn-active {
+    background-color: #16213e;
+    color: white;
+    font-weight: 600;
+}
+
+.main-menu-logout-btn {
+    width: 36px;
+    height: 36px;
+    background-color: rgba(233, 69, 96, 0.2);
+    color: #e94560;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.main-menu-logout-btn:hover {
+    background-color: #e94560;
+    color: white;
+}
+
+.main-menu-main {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.main-menu-tab-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-menu-tab-title {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #212529;
+}
+
+.main-menu-placeholder-text {
+    margin: 0;
+    font-size: 16px;
+    color: #000000;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

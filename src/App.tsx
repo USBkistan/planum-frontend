@@ -1,14 +1,8 @@
-import { useNavigate } from "react-router";
+import { MainMenu } from "./components/layout/MainMenu";
 import "./index.css";
 
 export function App() {
-    let navigate = useNavigate();
-
-    return (
-        <div className="app">
-            <button onClick={() => navigate("/login")}>To login page</button>
-        </div>
-    );
+    return <MainMenu />;
 }
 
 export default App;

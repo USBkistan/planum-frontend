@@ -1,15 +1,17 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { App } from "./App";
-import { AuthForm } from "./AuthForm";
+import { AuthProvider, AuthGuard } from "./components/auth/AuthProvider";
+import "./index.css";
 
 const elem = document.getElementById("root")!;
 const app = (
     <BrowserRouter>
-        <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/login" element={<AuthForm />} />
-        </Routes>
+        <AuthProvider>
+            <Routes>
+                <Route path="/" element={<AuthGuard><App /></AuthGuard>} />
+            </Routes>
+        </AuthProvider>
     </BrowserRouter>
 );
 
