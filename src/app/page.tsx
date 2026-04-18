@@ -1,8 +1,7 @@
-import AuthProvider from "@/components/AuthProvider";
-
-
 export default function Home() {
     return (
-        <AuthProvider />
+        <div>
+            Its home page
+        </div>
     );
 }
