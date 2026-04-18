@@ -3,8 +3,9 @@ import { Geist, Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/web/navbar";
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -22,10 +23,20 @@ export default function RootLayout(
         <html
             lang="en"
             className={cn("h-full", "antialiased", geistSans.variable, "font-sans", inter.variable)}
+            suppressHydrationWarning
         >
-            <body className="min-h-full flex flex-col">
-                <Navbar />
-                {children}
+            <body className="h-full">
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <main className="max-w-7xl mx-auto w-full px-4 md:px-6 lg:px-8">
+                        <Navbar />
+                        {children}
+                    </main>
+                </ThemeProvider>
             </body>
         </html>
     );
