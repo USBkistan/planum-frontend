@@ -8,8 +8,11 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { loginRequest } from "@/services/auth";
+import { useAuth } from "@/components/web/auth-provider";
 
 export default function LoginPage() {
+  const { login } = useAuth()!;
+
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -19,8 +22,8 @@ export default function LoginPage() {
   });
 
   async function onSubmit(payload: { email: string, password: string }) {
-    console.log(payload)
-    await loginRequest(payload);
+    const token = (await loginRequest(payload))!;
+    login(token);
   }
 
   return (

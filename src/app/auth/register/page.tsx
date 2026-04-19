@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/components/web/auth-provider";
+import { registerRequest } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { registerRequest } from "@/services/auth";
 
 export default function RegisterPage() {
+  const { login } = useAuth()!;
+
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -20,8 +23,8 @@ export default function RegisterPage() {
   });
 
   async function onSubmit(payload: { username: string, email: string, password: string }) {
-    console.log(payload);
-    await registerRequest(payload);
+    const token = (await registerRequest(payload))!;
+    login(token);
   }
 
   return (

@@ -9,7 +9,7 @@ const apiClient = axios.create({
     timeout: 1000,
 });
 
-export async function loginRequest(data: z.infer<typeof loginSchema>) {
+export async function loginRequest(data: z.infer<typeof loginSchema>): Promise<string | undefined> {
     const payload = {
         username: data.email,
         password: data.password,
@@ -30,10 +30,11 @@ export async function loginRequest(data: z.infer<typeof loginSchema>) {
     if (response) {
         console.log(response.status);
         console.log(response.data);
+        return response.data["access_token"];
     }
 }
 
-export async function registerRequest(data: z.infer<typeof registerSchema>) {
+export async function registerRequest(data: z.infer<typeof registerSchema>): Promise<string | undefined> {
     const payload = {
         display_name: data.username,
         email: data.email,
@@ -53,5 +54,6 @@ export async function registerRequest(data: z.infer<typeof registerSchema>) {
     if (response) {
         console.log(response.status);
         console.log(response.data);
+        return response.data["access_token"];
     }
 }
