@@ -18,12 +18,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = Cookies.get('token');
+      const token = Cookies.get('access_token');
       if (token) {
         try {
           setIsAuthenticated(true);
         } catch {
-          Cookies.remove('token');
+          Cookies.remove('access_token');
         }
       }
       setIsLoading(false);
@@ -34,10 +34,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = (token: string) => {
     Cookies.set('access_token', token, { expires: 7 });
+    setIsAuthenticated(true);
   }
 
   const logout = () => {
     Cookies.remove('access_token');
+    setIsAuthenticated(false);
   };
 
   return (

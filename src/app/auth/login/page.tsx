@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { loginRequest } from "@/services/auth";
 import { useAuth } from "@/components/web/auth-provider";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
   const { login } = useAuth()!;
@@ -24,6 +25,7 @@ export default function LoginPage() {
   async function onSubmit(payload: { email: string, password: string }) {
     const token = (await loginRequest(payload))!;
     login(token);
+    redirect("/");
   }
 
   return (

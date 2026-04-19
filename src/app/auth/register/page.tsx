@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/web/auth-provider";
 import { registerRequest } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { redirect } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
 export default function RegisterPage() {
@@ -25,6 +26,7 @@ export default function RegisterPage() {
   async function onSubmit(payload: { username: string, email: string, password: string }) {
     const token = (await registerRequest(payload))!;
     login(token);
+    redirect("/");
   }
 
   return (
