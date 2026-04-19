@@ -7,6 +7,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { registerRequest } from "@/services/auth";
 
 export default function RegisterPage() {
   const form = useForm({
@@ -18,8 +19,9 @@ export default function RegisterPage() {
     }
   });
 
-  function onSubmit(payload: { username: string, email: string, password: string }) {
-    console.log(payload)
+  async function onSubmit(payload: { username: string, email: string, password: string }) {
+    console.log(payload);
+    await registerRequest(payload);
   }
 
   return (
