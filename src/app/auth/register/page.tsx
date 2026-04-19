@@ -18,8 +18,8 @@ export default function RegisterPage() {
     }
   });
 
-  function onSubmit() {
-    console.log("yo")
+  function onSubmit(payload: { username: string, email: string, password: string }) {
+    console.log(payload)
   }
 
   return (
