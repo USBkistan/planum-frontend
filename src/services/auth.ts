@@ -9,13 +9,16 @@ const apiClient = axios.create({
     timeout: 1000,
 });
 
-export async function loginRequest(data: z.infer<typeof loginSchema>): Promise<string | undefined> {
+interface AuthResponse {
+    access_token: string,
+    refresh_token: string,
+}
+
+export async function loginRequest(data: z.infer<typeof loginSchema>): Promise<AuthResponse | undefined> {
     const payload = {
         username: data.email,
         password: data.password,
     }
-
-    console.log(payload);
 
     const response = await apiClient.post(
         "/auth/login",
@@ -28,13 +31,14 @@ export async function loginRequest(data: z.infer<typeof loginSchema>): Promise<s
     });
 
     if (response) {
-        console.log(response.status);
-        console.log(response.data);
-        return response.data["access_token"];
+        return {
+            access_token: response.data["access_token"],
+            refresh_token: response.data["refresh_token"],
+        };
     }
 }
 
-export async function registerRequest(data: z.infer<typeof registerSchema>): Promise<string | undefined> {
+export async function registerRequest(data: z.infer<typeof registerSchema>): Promise<AuthResponse | undefined> {
     const payload = {
         display_name: data.username,
         email: data.email,
@@ -52,8 +56,9 @@ export async function registerRequest(data: z.infer<typeof registerSchema>): Pro
     });
 
     if (response) {
-        console.log(response.status);
-        console.log(response.data);
-        return response.data["access_token"];
+        return {
+            access_token: response.data["access_token"],
+            refresh_token: response.data["refresh_token"],
+        };
     }
 }

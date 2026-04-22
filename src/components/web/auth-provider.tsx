@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string) => void;
+  login: (access_token: string, refresh_token: string) => void;
   logout: () => void;
 }
 
@@ -32,8 +32,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = (token: string) => {
-    Cookies.set('access_token', token, { expires: 7 });
+  const login = (access_token: string, refresh_token: string) => {
+    Cookies.set('access_token', access_token, { expires: 7 });
+    Cookies.set('refresh_token', refresh_token, { expires: 30 });
     setIsAuthenticated(true);
   }
 

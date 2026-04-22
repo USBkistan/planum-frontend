@@ -24,8 +24,8 @@ export default function RegisterPage() {
   });
 
   async function onSubmit(payload: { username: string, email: string, password: string }) {
-    const token = (await registerRequest(payload))!;
-    login(token);
+    const auth = (await registerRequest(payload))!;
+    login(auth.access_token, auth.refresh_token);
     redirect("/");
   }
 

@@ -28,7 +28,6 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <div>{isAuthenticated ? "true" : "false"}</div>
         {
           isAuthenticated ?
             <Button variant={"secondary"} onClick={() => { logout() }}>
