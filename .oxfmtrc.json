@@ -1,0 +1,17 @@
+{
+    "printWidth": 88,
+    "tabWidth": 4,
+    "sortImports": true,
+    "sortTailwindcss": true,
+    "overrides": [
+        {
+            "files": ["*.jsx", "*.tsx"],
+            "options": {
+                "printWidth": 100,
+                "tabWidth": 2
+            }
+        }
+    ],
+    "$schema": "./node_modules/oxfmt/configuration_schema.json",
+    "ignorePatterns": []
+}

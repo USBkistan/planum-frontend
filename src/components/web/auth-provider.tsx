@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
+import { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -18,12 +18,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = Cookies.get('access_token');
+      const token = Cookies.get("access_token");
       if (token) {
         try {
           setIsAuthenticated(true);
         } catch {
-          Cookies.remove('access_token');
+          Cookies.remove("access_token");
         }
       }
       setIsLoading(false);
@@ -33,13 +33,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = (access_token: string, refresh_token: string) => {
-    Cookies.set('access_token', access_token, { expires: 7 });
-    Cookies.set('refresh_token', refresh_token, { expires: 30 });
+    Cookies.set("access_token", access_token, { expires: 7 });
+    Cookies.set("refresh_token", refresh_token, { expires: 30 });
     setIsAuthenticated(true);
-  }
+  };
 
   const logout = () => {
-    Cookies.remove('access_token');
+    Cookies.remove("access_token");
     setIsAuthenticated(false);
   };
 

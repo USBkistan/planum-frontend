@@ -1,15 +1,16 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { redirect } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+
 import { loginSchema } from "@/app/schemas/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { loginRequest } from "@/services/auth";
 import { useAuth } from "@/components/web/auth-provider";
-import { redirect } from "next/navigation";
+import { loginRequest } from "@/services/auth";
 
 export default function LoginPage() {
   const { login } = useAuth()!;
@@ -19,10 +20,10 @@ export default function LoginPage() {
     defaultValues: {
       email: "",
       password: "",
-    }
+    },
   });
 
-  async function onSubmit(payload: { email: string, password: string }) {
+  async function onSubmit(payload: { email: string; password: string }) {
     const auth = (await loginRequest(payload))!;
     login(auth.access_token, auth.refresh_token);
     redirect("/");
@@ -45,26 +46,24 @@ export default function LoginPage() {
                   <FieldLabel>Email</FieldLabel>
                   <Input
                     aria-invalid={fieldState.invalid}
-                    placeholder="example@email.com" {...field} />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                    placeholder="example@email.com"
+                    {...field}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
-              )} />
+              )}
+            />
             <Controller
               name="password"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>Пароль</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    placeholder="********" {...field} />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  <Input aria-invalid={fieldState.invalid} placeholder="********" {...field} />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
-              )} />
+              )}
+            />
             <Button>Войти</Button>
           </FieldGroup>
         </form>

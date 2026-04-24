@@ -2,7 +2,7 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const serverUrl = "http://127.0.0.1:8000/v1";
+import { serverUrl } from "@/services/globals";
 
 export async function POST() {
     const cookieStore = await cookies();
@@ -12,28 +12,28 @@ export async function POST() {
         {},
         {
             headers: {
-                Cookie: `${refreshTokenCookie.name}=${refreshTokenCookie.value}`
-            }
+                Cookie: `${refreshTokenCookie.name}=${refreshTokenCookie.value}`,
+            },
         },
-    )
+    );
 
     const access_token = data["access_token"];
     const refresh_token = data["refresh_token"];
 
     const nextResponse = NextResponse.json({ access_token }, { status: 200 });
 
-    nextResponse.cookies.set('access_token', access_token, {
+    nextResponse.cookies.set("access_token", access_token, {
         httpOnly: true,
         secure: false,
-        sameSite: 'lax',
-        path: '/',
+        sameSite: "lax",
+        path: "/",
         maxAge: 60 * 60 * 24 * 7,
     });
-    nextResponse.cookies.set('refresh_token', refresh_token, {
+    nextResponse.cookies.set("refresh_token", refresh_token, {
         httpOnly: true,
         secure: false,
-        sameSite: 'lax',
-        path: '/',
+        sameSite: "lax",
+        path: "/",
         maxAge: 60 * 60 * 24 * 30,
     });
 

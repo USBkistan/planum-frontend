@@ -1,7 +1,7 @@
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import axios from "axios";
+import Cookies from "js-cookie";
 
-const serverUrl = "http://127.0.0.1:8000/v1";
+import { serverUrl } from "./globals";
 
 export const privateApiClient = axios.create({
     baseURL: serverUrl,
@@ -9,7 +9,7 @@ export const privateApiClient = axios.create({
 });
 
 privateApiClient.interceptors.request.use((config) => {
-    const token = Cookies.get('access_token');
+    const token = Cookies.get("access_token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,12 +28,12 @@ privateApiClient.interceptors.response.use(
                 const { data } = await axios.post(
                     `/api/auth/refresh`,
                     {},
-                    { withCredentials: true }
-                )
-                console.log(data)
+                    { withCredentials: true },
+                );
+                console.log(data);
 
                 const newAccessToken = data.access_token;
-                Cookies.set('access_token', newAccessToken);
+                Cookies.set("access_token", newAccessToken);
 
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return privateApiClient(originalRequest);
@@ -45,5 +45,5 @@ privateApiClient.interceptors.response.use(
         }
 
         return Promise.reject(error);
-    }
+    },
 );
