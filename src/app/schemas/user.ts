@@ -7,3 +7,7 @@ export const userSchema = z.object({
     created_at: z.iso.datetime(),
     updated_at: z.iso.datetime(),
 });
+
+export const userChangeSchema = z.object({
+    password: z.string().min(8).optional(),
+});
