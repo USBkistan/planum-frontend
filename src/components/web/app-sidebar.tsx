@@ -8,6 +8,8 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
+import { buttonVariants } from "../ui/button";
+
 export function AppSidebar() {
   return (
     <Sidebar>
@@ -18,17 +20,17 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <Link href={"/dashboard/board"}>
+          <Link className={buttonVariants({ variant: "secondary" })} href={"/dashboard/board"}>
             <h1 className="text-3xs font-bold">Доска задач</h1>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link href={"/dashboard/vault"}>
+          <Link className={buttonVariants({ variant: "secondary" })} href={"/dashboard/vault"}>
             <h1 className="text-3xs font-bold">Хранилище</h1>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link href={"/dashboard/chat"}>
+          <Link className={buttonVariants({ variant: "secondary" })} href={"/dashboard/chat"}>
             <h1 className="text-3xs font-bold">Чат</h1>
           </Link>
         </SidebarGroup>

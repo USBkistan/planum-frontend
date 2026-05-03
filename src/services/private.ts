@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { redirect } from "next/navigation";
 
 import { serverUrl } from "./globals";
 
@@ -38,9 +39,8 @@ privateApiClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return privateApiClient(originalRequest);
             } catch (refreshError) {
-                // Cookies.remove('access_token');
-                // window.location.href = '/login';
-                return Promise.reject(refreshError);
+                Cookies.remove("access_token");
+                redirect("/auth/login");
             }
         }
 
