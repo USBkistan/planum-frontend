@@ -15,15 +15,6 @@ export function Navbar() {
         <Link href={"/"}>
           <h1 className="text-3xl font-bold">Planum</h1>
         </Link>
-
-        <div className="flex items-center gap-2">
-          <Link className={buttonVariants({ variant: "ghost" })} href={"/dashboard"}>
-            Настройки
-          </Link>
-          <Link className={buttonVariants({ variant: "ghost" })} href={"/profile"}>
-            Аккаунт
-          </Link>
-        </div>
       </div>
 
       <div className="flex items-center gap-2">

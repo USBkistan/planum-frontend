@@ -4,7 +4,11 @@ import type { NextRequest } from "next/server";
 export function proxy(request: NextRequest) {
     const token = request.cookies.get("access_token");
 
-    if (!token) {
+    if (token && request.nextUrl.pathname === "/") {
+        return NextResponse.redirect(new URL("/dashboard/board", request.url));
+    }
+
+    if (!token && request.nextUrl.pathname !== "/") {
         return NextResponse.redirect(new URL("/auth/login", request.url));
     }
 
@@ -12,5 +16,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard", "/profile"],
+    matcher: ["/", "/dashboard", "/profile"],
 };

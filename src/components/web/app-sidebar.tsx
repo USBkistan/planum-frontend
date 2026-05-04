@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Sidebar,
@@ -11,6 +14,9 @@ import {
 import { buttonVariants } from "../ui/button";
 
 export function AppSidebar() {
+  const pathname = usePathname();
+
+  const isActive = (href: string) => pathname === href;
   return (
     <Sidebar>
       <SidebarHeader>
@@ -18,20 +24,45 @@ export function AppSidebar() {
           <h1 className="text-3xl font-bold">Planum</h1>
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="gap-0">
         <SidebarGroup>
-          <Link className={buttonVariants({ variant: "secondary" })} href={"/dashboard/board"}>
+          <Link
+            className={buttonVariants({
+              variant: isActive("/dashboard/board") ? "default" : "secondary",
+            })}
+            href={"/dashboard/board"}
+          >
             <h1 className="text-3xs font-bold">Доска задач</h1>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link className={buttonVariants({ variant: "secondary" })} href={"/dashboard/vault"}>
+          <Link
+            className={buttonVariants({
+              variant: isActive("/dashboard/vault") ? "default" : "secondary",
+            })}
+            href={"/dashboard/vault"}
+          >
             <h1 className="text-3xs font-bold">Хранилище</h1>
           </Link>
         </SidebarGroup>
         <SidebarGroup>
-          <Link className={buttonVariants({ variant: "secondary" })} href={"/dashboard/chat"}>
+          <Link
+            className={buttonVariants({
+              variant: isActive("/dashboard/chat") ? "default" : "secondary",
+            })}
+            href={"/dashboard/chat"}
+          >
             <h1 className="text-3xs font-bold">Чат</h1>
+          </Link>
+        </SidebarGroup>
+        <SidebarGroup>
+          <Link
+            className={buttonVariants({
+              variant: isActive("/dashboard/settings") ? "default" : "secondary",
+            })}
+            href={"/dashboard/settings"}
+          >
+            <h1 className="text-3xs font-bold">Настройки</h1>
           </Link>
         </SidebarGroup>
       </SidebarContent>
