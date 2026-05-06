@@ -1,10 +1,11 @@
 import { Badge } from "../ui/badge";
-import { Card, CardHeader, CardContent } from "../ui/card";
+import { Item, ItemContent, ItemTitle } from "../ui/item";
 
 interface TaskProps {
   title?: string;
   assignee?: string;
   priority?: "low" | "medium" | "high";
+  description?: string;
 }
 
 const priorityColors = {
@@ -17,24 +18,20 @@ export default function Task({
   title = "Task Title",
   assignee = "Unassigned",
   priority = "medium",
+  description,
 }: TaskProps) {
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
-        <h3 className="text-sm font-semibold">{title}</h3>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-600">Assignee:</span>
-          <span className="text-xs font-medium">{assignee}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-600">Priority:</span>
-          <Badge className={`text-xs ${priorityColors[priority]}`}>
+    <Item variant={"outline"} className="p-3">
+      <ItemContent className="gap-2">
+        {title && <ItemTitle className="line-clamp-2 text-sm">{title}</ItemTitle>}
+        {description && <p className="line-clamp-2 text-xs text-gray-500">{description}</p>}
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-xs text-gray-600">{assignee}</span>
+          <Badge className={`shrink-0 text-xs ${priorityColors[priority]}`}>
             {priority.charAt(0).toUpperCase() + priority.slice(1)}
           </Badge>
         </div>
-      </CardContent>
-    </Card>
+      </ItemContent>
+    </Item>
   );
 }
