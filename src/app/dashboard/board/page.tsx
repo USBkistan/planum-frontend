@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 
-import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
+import { Item, ItemTitle } from "@/components/ui/item";
 import Task from "@/components/web/task";
+import TaskPopover from "@/components/web/task-popover";
 
 interface TaskData {
   id: string;
@@ -41,6 +42,9 @@ export default function BoardPage() {
     null,
   );
 
+  const [taskTitle, setTaskTitle] = useState("");
+  const [openPopover, setOpenPopover] = useState<string | null>(null);
+
   const handleDragStart = (taskId: string, sourceGroup: string) => {
     setDraggedTask({ taskId, sourceGroup });
   };
@@ -77,11 +81,43 @@ export default function BoardPage() {
     setDraggedTask(null);
   };
 
+  const handleAddTask = (groupKey: string) => {
+    if (!taskTitle.trim()) return;
+
+    const newTask: TaskData = {
+      id: Date.now().toString(),
+      title: taskTitle,
+      assignee: "Unassigned",
+      priority: "medium",
+    };
+
+    setTasks((prev) => ({
+      ...prev,
+      [groupKey]: [...prev[groupKey as keyof typeof prev], newTask],
+    }));
+
+    setTaskTitle("");
+    setOpenPopover(null);
+  };
+
   const renderTasksColumn = (groupKey: string, groupLabel: string, taskList: TaskData[]) => (
-    <Item variant={"outline"} className="flex flex-1 flex-col items-start gap-2.5 p-3">
-      <ItemTitle>{groupLabel}</ItemTitle>
-      <ItemContent
-        className="w-full gap-2.5"
+    <Item
+      variant={"outline"}
+      className="flex max-h-full min-h-0 flex-1 flex-col items-start gap-2.5 p-3"
+    >
+      <div className="flex w-full items-center gap-2">
+        <ItemTitle>{groupLabel}</ItemTitle>
+        <TaskPopover
+          groupKey={groupKey}
+          taskTitle={taskTitle}
+          openPopover={openPopover}
+          setOpenPopover={setOpenPopover}
+          handleAddTask={handleAddTask}
+          setTaskTitle={setTaskTitle}
+        />
+      </div>
+      <div
+        className="flex w-full flex-1 flex-col gap-2.5 overflow-y-auto"
         onDragOver={handleDragOver}
         onDrop={() => handleDrop(groupKey)}
       >
@@ -90,12 +126,12 @@ export default function BoardPage() {
             key={task.id}
             draggable
             onDragStart={() => handleDragStart(task.id, groupKey)}
-            className="cursor-move"
+            className="w-full shrink-0 cursor-move"
           >
             <Task title={task.title} assignee={task.assignee} priority={task.priority} />
           </div>
         ))}
-      </ItemContent>
+      </div>
     </Item>
   );
 
