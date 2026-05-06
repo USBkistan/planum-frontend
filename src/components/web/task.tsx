@@ -1,12 +1,7 @@
+import { TaskData } from "@/app/schemas/tasks";
+
 import { Badge } from "../ui/badge";
 import { Item, ItemContent, ItemTitle } from "../ui/item";
-
-interface TaskProps {
-  title?: string;
-  assignee?: string;
-  priority?: "low" | "medium" | "high";
-  description?: string;
-}
 
 const priorityColors = {
   low: "bg-green-100 text-green-800",
@@ -14,12 +9,7 @@ const priorityColors = {
   high: "bg-red-100 text-red-800",
 };
 
-export default function Task({
-  title = "Task Title",
-  assignee = "Unassigned",
-  priority = "medium",
-  description,
-}: TaskProps) {
+export default function Task({ title, assignee, priority, description }: TaskData) {
   return (
     <Item variant={"outline"} className="p-3">
       <ItemContent className="gap-2">

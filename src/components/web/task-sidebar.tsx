@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { TaskData } from "@/app/schemas/tasks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,14 +20,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-
-interface TaskData {
-  id: string;
-  title: string;
-  description: string;
-  assignee: string;
-  priority: "low" | "medium" | "high";
-}
 
 interface TaskSidebarProps {
   task: TaskData | null;
