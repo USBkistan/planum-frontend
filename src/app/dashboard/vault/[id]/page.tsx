@@ -1,7 +1,7 @@
 "use client";
 
-import { Folder, File, Plus, FolderSearchIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Folder, File, Plus, ArrowLeft } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import type { VaultFolder, VaultItem } from "@/app/schemas/vault";
@@ -11,8 +11,11 @@ import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getVault } from "@/services/vault";
 
-export default function VaultPage() {
+export default function VaultFolderPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+
   const [folder, setFolder] = useState<VaultFolder | null>(null);
   const [loading, setLoading] = useState(true);
   const [newItemName, setNewItemName] = useState("");
@@ -21,10 +24,10 @@ export default function VaultPage() {
   useEffect(() => {
     const fetchFolder = async () => {
       try {
-        const folders = await getVault(null);
+        const folders = await getVault(id);
         setFolder(folders);
       } catch (error) {
-        console.error("Failed to fetch vault:", error);
+        console.error("Failed to fetch vault folder:", error);
       } finally {
         setLoading(false);
       }
@@ -82,8 +85,12 @@ export default function VaultPage() {
     setOpenPopover(null);
   };
 
-  const handleOpenFolder = (folderId: string) => {
-    router.push(`/dashboard/vault/${folderId}`);
+  const handleOpenFolder = (childFolderId: string) => {
+    router.push(`/dashboard/vault/${childFolderId}`);
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   const formatFileSize = (bytes: number) => {
@@ -97,7 +104,12 @@ export default function VaultPage() {
   return (
     <div className="flex h-full flex-col gap-4 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{folder.name}</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={handleGoBack} className="h-8 w-8 p-0">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">{folder.name}</h1>
+        </div>
 
         <div className="flex gap-2">
           <Popover

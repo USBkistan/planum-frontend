@@ -16,7 +16,7 @@ import { buttonVariants } from "../ui/button";
 export function AppSidebar() {
   const pathname = usePathname();
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => pathname.includes(href);
   return (
     <Sidebar>
       <SidebarHeader>
