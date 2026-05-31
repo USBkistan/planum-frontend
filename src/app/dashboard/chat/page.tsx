@@ -8,24 +8,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { getChatMessages } from "@/services/chat";
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "1",
-      sender: "user-1",
-      senderName: "Alice",
-      content: "Hey, how are you?",
-      timestamp: new Date(Date.now() - 5000),
-    },
-    {
-      id: "2",
-      sender: "user-2",
-      senderName: "Bob",
-      content: "I'm doing great! How about you?",
-      timestamp: new Date(Date.now() - 3000),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  useEffect(() => {
+    const fetchChatMessages = async () => {
+      try {
+        const messages = await getChatMessages();
+        setMessages(messages);
+      } catch (error) {
+        console.error("Failed to fetch chat messages:", error);
+      }
+    };
+
+    fetchChatMessages();
+  }, []);
+
   const [inputValue, setInputValue] = useState("");
   const [currentUser] = useState("user-1");
   const [currentUserName] = useState("Alice");
