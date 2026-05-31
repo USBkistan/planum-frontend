@@ -1,7 +1,15 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 export default function DashboardPage() {
-  return (
-    <div className="flex h-full w-full flex-row">
-      <div className="bg-amber-500">yo1</div>
-    </div>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to board page
+    router.push("/dashboard/board");
+  }, [router]);
+
+  return null;
 }

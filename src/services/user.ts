@@ -1,3 +1,4 @@
+import axios from "axios";
 import z from "zod";
 
 import { userSchema } from "@/app/schemas/user";
@@ -14,6 +15,10 @@ export async function getMeRequest(): Promise<z.infer<typeof userSchema> | undef
     if (response) {
         return userSchema.decode(response.data);
     }
+}
+
+export async function getMeWrapper() {
+    await axios.get(`/api/users/me`, { withCredentials: true });
 }
 
 export async function updatePasswordRequest(new_password: string) {
