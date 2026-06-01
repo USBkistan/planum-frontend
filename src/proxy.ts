@@ -3,7 +3,8 @@ import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
     const token = request.cookies.get("access_token");
-    const groupId = request.cookies.get("group_id");
+    const hasGroup =
+        request.cookies.get("group_id") !== undefined || "null" ? true : false;
 
     if (
         !token &&
@@ -20,7 +21,7 @@ export function proxy(request: NextRequest) {
     if (
         token &&
         request.nextUrl.pathname.startsWith("/dashboard") &&
-        !groupId &&
+        !hasGroup &&
         request.nextUrl.pathname !== "/group"
     ) {
         return NextResponse.redirect(new URL("/group", request.url));
