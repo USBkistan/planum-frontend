@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const accessTokenCookie = cookieStore.get("access_token")!;
     const body = await request.json();
     const { data } = await axios.post(
-        `${serverUrl}/groups`,
+        `${serverUrl}/groups/invite`,
         { ...body },
         {
             headers: {

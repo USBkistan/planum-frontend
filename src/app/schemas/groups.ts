@@ -12,3 +12,7 @@ export const groupSchema = z.object({
 export interface GroupCreateData {
     name: string;
 }
+
+export interface GroupInviteData {
+    code: string;
+}

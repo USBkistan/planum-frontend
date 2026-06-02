@@ -1,7 +1,6 @@
 "use client";
 
-import { Copy, Check } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createGroupRequest } from "@/services/groups";
+import { createGroupRequest, inviteToGroupRequest } from "@/services/groups";
 
 export default function GroupPage() {
   const router = useRouter();
@@ -17,8 +16,6 @@ export default function GroupPage() {
   const [joinGroupCode, setJoinGroupCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -34,18 +31,17 @@ export default function GroupPage() {
     }
 
     setLoading(true);
-    // try {
-    // TODO: Call API to create group
-    const group = await createGroupRequest({ name: createGroupName });
-    console.log(group);
-    showMessage("success", "Group created successfully!");
-    setCreateGroupName("");
-    redirect("/dashboard/board");
-    // } catch (error) {
-    //   showMessage("error", "Failed to create group");
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      await createGroupRequest({ name: createGroupName });
+      showMessage("success", "Group created successfully!");
+      setCreateGroupName("");
+      router.push("/dashboard/board");
+    } catch (error) {
+      console.log(error);
+      showMessage("error", "Failed to create group");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleJoinGroup = async (e: React.FormEvent) => {
@@ -58,27 +54,14 @@ export default function GroupPage() {
 
     setLoading(true);
     try {
-      // TODO: Call API to join group with code
+      await inviteToGroupRequest({ code: joinGroupCode });
       showMessage("success", "Successfully joined the group!");
       setJoinGroupCode("");
-
-      // Save to cookies and redirect after 2 seconds
-      setTimeout(() => {
-        document.cookie = `group_id=${joinGroupCode}; path=/; max-age=${60 * 60 * 24 * 365}`;
-        router.push("/dashboard/board");
-      }, 2000);
+      router.push("/dashboard/board");
     } catch (error) {
       showMessage("error", "Invalid group code or failed to join");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleCopyCode = () => {
-    if (generatedCode) {
-      navigator.clipboard.writeText(generatedCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -100,30 +83,6 @@ export default function GroupPage() {
         >
           {message.text}
         </div>
-      )}
-
-      {/* Generated Code Display */}
-      {generatedCode && (
-        <Card className="mb-6 w-full max-w-md border-green-200 bg-green-50">
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <p className="text-sm text-gray-600">Ваш код группы:</p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 rounded bg-white px-3 py-2 font-mono text-lg font-bold text-green-700">
-                  {generatedCode}
-                </code>
-                <Button onClick={handleCopyCode} variant="outline" size="icon" className="shrink-0">
-                  {copied ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <p className="text-xs text-gray-600">Поделитесь этим кодом с членами вашей группы</p>
-            </div>
-          </CardContent>
-        </Card>
       )}
 
       {/* Tabs */}
