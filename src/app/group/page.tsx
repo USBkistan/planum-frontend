@@ -1,7 +1,7 @@
 "use client";
 
 import { Copy, Check } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createGroupRequest } from "@/services/groups";
 
 export default function GroupPage() {
   const router = useRouter();
@@ -33,23 +34,18 @@ export default function GroupPage() {
     }
 
     setLoading(true);
-    try {
-      // TODO: Call API to create group
-      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-      setGeneratedCode(code);
-      showMessage("success", "Group created successfully!");
-      setCreateGroupName("");
-
-      // Save to cookies and redirect after 2 seconds
-      setTimeout(() => {
-        document.cookie = `group_id=${code}; path=/; max-age=${60 * 60 * 24 * 365}`;
-        router.push("/dashboard/board");
-      }, 2000);
-    } catch (error) {
-      showMessage("error", "Failed to create group");
-    } finally {
-      setLoading(false);
-    }
+    // try {
+    // TODO: Call API to create group
+    const group = await createGroupRequest({ name: createGroupName });
+    console.log(group);
+    showMessage("success", "Group created successfully!");
+    setCreateGroupName("");
+    redirect("/dashboard/board");
+    // } catch (error) {
+    //   showMessage("error", "Failed to create group");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleJoinGroup = async (e: React.FormEvent) => {
