@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { serverUrl } from "@/services/globals";
-import { getMeRequest } from "@/services/user";
 
 export async function GET() {
     const cookieStore = await cookies();

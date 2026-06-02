@@ -11,7 +11,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/web/auth-provider";
 import { registerRequest } from "@/services/auth";
-import { getMeWrapper } from "@/services/user";
+import { getMeRequest } from "@/services/user";
 
 export default function RegisterPage() {
   const { login } = useAuth()!;
@@ -28,7 +28,7 @@ export default function RegisterPage() {
   async function onSubmit(payload: { username: string; email: string; password: string }) {
     const auth = (await registerRequest(payload))!;
     login(auth.access_token, auth.refresh_token);
-    await getMeWrapper();
+    await getMeRequest();
     redirect("/");
   }
 
