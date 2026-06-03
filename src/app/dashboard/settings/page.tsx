@@ -1,7 +1,9 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { Copy, Eye, EyeOff, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import {
   AlertDialog,
@@ -16,10 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getInviteCodeRequest, leaveGroupRequest } from "@/services/groups";
+import { getMeRequest, updateNameRequest, updatePasswordRequest } from "@/services/user";
 
 export default function SettingsPage() {
-  const [name, setName] = useState("Alice");
-  const [groupCode, setGroupCode] = useState("GROUP-123456");
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [groupCode, setGroupCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -27,6 +32,24 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      const code = await getInviteCodeRequest();
+      setGroupCode(code);
+
+      const user = await getMeRequest();
+      setName(user.display_name);
+    };
+
+    fetchData();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -41,7 +64,7 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      // TODO: Call API to update name
+      updateNameRequest(name);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       showMessage("success", "Name updated successfully");
     } catch (error) {
@@ -69,7 +92,7 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      // TODO: Call API to change password
+      updatePasswordRequest(newPassword);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setCurrentPassword("");
       setNewPassword("");
@@ -87,26 +110,14 @@ export default function SettingsPage() {
     showMessage("success", "Group code copied to clipboard");
   };
 
-  const handleGetGroupCode = async () => {
-    setLoading(true);
-    try {
-      // TODO: Call API to get group code
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      showMessage("success", "Group code retrieved successfully");
-    } catch (error) {
-      showMessage("error", "Failed to get group code");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLeaveGroup = async () => {
     setLoading(true);
     try {
-      // TODO: Call API to leave group
+      await leaveGroupRequest();
+      Cookies.remove("group_id");
       await new Promise((resolve) => setTimeout(resolve, 1000));
       showMessage("success", "You have left the group");
-      // TODO: Redirect to home or login
+      router.push("/");
     } catch (error) {
       showMessage("error", "Failed to leave group");
     } finally {
@@ -240,16 +251,6 @@ export default function SettingsPage() {
                 </Button>
               </div>
             </div>
-
-            {/* Get Group Code Button */}
-            <Button
-              onClick={handleGetGroupCode}
-              variant="outline"
-              disabled={loading}
-              className="w-full"
-            >
-              Get Group Code
-            </Button>
 
             {/* Leave Group Button */}
             <AlertDialog>

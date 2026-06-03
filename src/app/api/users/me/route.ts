@@ -22,7 +22,7 @@ export async function GET() {
     const nextResponse = NextResponse.json({ data }, { status: 200 });
 
     nextResponse.cookies.set("group_id", group_id, {
-        httpOnly: true,
+        httpOnly: false,
         secure: false,
         sameSite: "lax",
         path: "/",

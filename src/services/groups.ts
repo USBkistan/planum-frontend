@@ -2,6 +2,8 @@ import axios from "axios";
 
 import { GroupCreateData, GroupInviteData } from "@/app/schemas/groups";
 
+import { privateApiClient } from "./private";
+
 export async function createGroupRequest(data: GroupCreateData) {
     await axios
         .post("/api/groups", { ...data }, { withCredentials: true })
@@ -20,4 +22,13 @@ export async function inviteToGroupRequest(data: GroupInviteData) {
                 console.log(error.response.status);
             }
         });
+}
+
+export async function getInviteCodeRequest(): Promise<string> {
+    const { data } = await privateApiClient.get("/groups/invite");
+    return data["code"];
+}
+
+export async function leaveGroupRequest() {
+    await privateApiClient.post("/groups/leave");
 }
