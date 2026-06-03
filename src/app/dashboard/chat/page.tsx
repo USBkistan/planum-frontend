@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { Send } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -8,28 +9,51 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { getChatMessages } from "@/services/chat";
+import { getChatMessages, sendChatMessage } from "@/services/chat";
+import { wsServerUrl } from "@/services/globals";
+import { getMeRequest } from "@/services/user";
 
 export default function ChatPage() {
+  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputValue, setInputValue] = useState("");
+  const [currentUser, setCurrentUser] = useState("");
+  const [currentUserName, setCurrentIUserName] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchChatMessages = async () => {
+    const access_token = Cookies.get("access_token")!;
+    const ws = new WebSocket(`${wsServerUrl}/messages?token=${access_token}`);
+
+    ws.onopen = () => console.log("Connected to server");
+
+    ws.onmessage = (event) => {
+      console.log(event.data);
+    };
+
+    ws.onclose = () => console.log("Disconnected from server");
+
+    setSocket(ws);
+
+    const fetchData = async () => {
       try {
         const messages = await getChatMessages();
         setMessages(messages);
+
+        const user = await getMeRequest();
+        setCurrentUser(user.id);
+        setCurrentIUserName(user.display_name);
       } catch (error) {
         console.error("Failed to fetch chat messages:", error);
       }
     };
 
-    fetchChatMessages();
-  }, []);
+    fetchData();
 
-  const [inputValue, setInputValue] = useState("");
-  const [currentUser] = useState("user-1");
-  const [currentUserName] = useState("Alice");
-  const scrollRef = useRef<HTMLDivElement>(null);
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -38,18 +62,19 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      sender: currentUser,
-      senderName: currentUserName,
-      content: inputValue,
-      timestamp: new Date(),
-    };
+    // const newMessage: ChatMessage = {
+    //   id: Date.now().toString(),
+    //   sender: currentUser,
+    //   senderName: currentUserName,
+    //   content: inputValue,
+    //   timestamp: new Date(),
+    // };
+    await sendChatMessage(inputValue);
 
-    setMessages((prev) => [...prev, newMessage]);
+    // setMessages((prev) => [...prev, newMessage]);
     setInputValue("");
   };
 
@@ -73,28 +98,28 @@ export default function ChatPage() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.sender === currentUser ? "justify-end" : "justify-start"}`}
+                  className={`flex ${message.user_id === currentUser ? "justify-end" : "justify-start"}`}
                 >
                   <div className="space-y-1">
                     <p
-                      className={`text-xs font-semibold ${message.sender === currentUser ? "text-right" : "text-left"} text-gray-600`}
+                      className={`text-xs font-semibold ${message.user_id === currentUser ? "text-right" : "text-left"} text-gray-600`}
                     >
-                      {message.senderName}
+                      {message.name}
                     </p>
                     <div
                       className={`max-w-xs rounded-lg px-4 py-2 ${
-                        message.sender === currentUser
+                        message.user_id === currentUser
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-gray-900"
                       }`}
                     >
-                      <p className="text-sm">{message.content}</p>
+                      <p className="text-sm">{message.text}</p>
                       <p
                         className={`mt-1 text-xs ${
-                          message.sender === currentUser ? "text-blue-100" : "text-gray-600"
+                          message.user_id === currentUser ? "text-blue-100" : "text-gray-600"
                         }`}
                       >
-                        {message.timestamp.toLocaleTimeString()}
+                        {new Date(message.created_at).toLocaleTimeString()}
                       </p>
                     </div>
                   </div>
