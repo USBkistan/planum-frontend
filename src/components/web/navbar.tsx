@@ -37,7 +37,7 @@ export function Navbar() {
             </Link>
           </>
         )}
-        <ThemeToggle />
+        <ThemeToggle size={"icon"} />
       </div>
     </nav>
   );

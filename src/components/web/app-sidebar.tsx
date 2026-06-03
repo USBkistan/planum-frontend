@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 
 import {
   Sidebar,
@@ -11,9 +11,12 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
-import { buttonVariants } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
+import { useAuth } from "./auth-provider";
+import { ThemeToggle } from "./theme-toggle";
 
 export function AppSidebar() {
+  const { isAuthenticated, logout } = useAuth()!;
   const pathname = usePathname();
 
   const isActive = (href: string) => pathname.includes(href);
@@ -66,7 +69,22 @@ export function AppSidebar() {
           </Link>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarGroup>
+          <ThemeToggle size={"default"} />
+        </SidebarGroup>
+        <SidebarGroup>
+          <Button
+            variant={"secondary"}
+            onClick={() => {
+              logout();
+              redirect("/");
+            }}
+          >
+            Выйти
+          </Button>
+        </SidebarGroup>
+      </SidebarFooter>
     </Sidebar>
   );
 }
