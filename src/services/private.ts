@@ -6,7 +6,7 @@ import { serverUrl } from "./globals";
 
 export const privateApiClient = axios.create({
     baseURL: serverUrl,
-    timeout: 1000,
+    timeout: 10000,
 });
 
 privateApiClient.interceptors.request.use((config) => {
