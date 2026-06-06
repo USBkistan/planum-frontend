@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getVault } from "@/services/vault";
+import { createFolder, getVault } from "@/services/vault";
 
 export default function VaultFolderPage() {
   const router = useRouter();
@@ -48,20 +48,16 @@ export default function VaultFolderPage() {
     return a.name.localeCompare(b.name);
   });
 
-  const handleCreateFolder = () => {
-    if (!newItemName.trim()) return;
+  const handleCreateFolder = async () => {
+    const name = newItemName.trim();
 
-    const newFolder: VaultItem = {
-      id: Math.random().toString(36).substring(2, 15),
-      name: newItemName,
-      type: "folder",
-      createdAt: new Date(),
-    };
+    if (!name) return;
 
-    setFolder({
-      ...folder,
-      items: [...folder.items, newFolder],
-    });
+    await createFolder({ parentId: id, name: name });
+
+    const folders = await getVault(id);
+    setFolder(folders);
+
     setNewItemName("");
     setOpenPopover(null);
   };

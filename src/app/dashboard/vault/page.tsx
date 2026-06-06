@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder, File, Plus, FolderSearchIcon } from "lucide-react";
+import { Folder, File, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getVault } from "@/services/vault";
+import { createFolder, getVault } from "@/services/vault";
 
 export default function VaultPage() {
   const router = useRouter();
@@ -45,20 +45,16 @@ export default function VaultPage() {
     return a.name.localeCompare(b.name);
   });
 
-  const handleCreateFolder = () => {
-    if (!newItemName.trim()) return;
+  const handleCreateFolder = async () => {
+    const name = newItemName.trim();
 
-    const newFolder: VaultItem = {
-      id: Math.random().toString(36).substring(2, 15),
-      name: newItemName,
-      type: "folder",
-      createdAt: new Date(),
-    };
+    if (!name) return;
 
-    setFolder({
-      ...folder,
-      items: [...folder.items, newFolder],
-    });
+    await createFolder({ parentId: null, name: name });
+
+    const folders = await getVault(null);
+    setFolder(folders);
+
     setNewItemName("");
     setOpenPopover(null);
   };
@@ -97,7 +93,7 @@ export default function VaultPage() {
   return (
     <div className="flex h-full flex-col gap-4 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{folder.name}</h1>
+        <h1 className="text-2xl font-bold">Хранилище</h1>
 
         <div className="flex gap-2">
           <Popover
