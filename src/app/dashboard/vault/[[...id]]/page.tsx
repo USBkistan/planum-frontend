@@ -1,15 +1,15 @@
 "use client";
 
-import { Folder, File, Plus, Upload, ArrowLeft } from "lucide-react";
+import { Folder, File, Plus, Upload, ArrowLeft, Download } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 
 import type { VaultFolder, VaultItem } from "@/app/schemas/vault";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { createFolder, getVault } from "@/services/vault";
+import { createFolder, getVaultFolder, uploadFiles } from "@/services/vault";
 
 export default function VaultFolderPage() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function VaultFolderPage() {
   useEffect(() => {
     const fetchFolder = async () => {
       try {
-        const folder = await getVault(id);
+        const folder = await getVaultFolder(id);
         setFolder(folder);
       } catch (error) {
         console.error("Failed to fetch vault:", error);
@@ -56,34 +56,21 @@ export default function VaultFolderPage() {
 
     await createFolder({ parentId: id, name: name });
 
-    const folder = await getVault(id);
+    const folder = await getVaultFolder(id);
     setFolder(folder);
 
     setNewFolderName("");
     setOpenPopover(null);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
 
-    Array.from(files).forEach((file) => {
-      const newFile: VaultItem = {
-        id: Math.random().toString(36).substring(2, 15),
-        name: file.name,
-        type: "file",
-        createdAt: new Date(),
-        size: file.size,
-      };
+    await uploadFiles(files, id);
 
-      setFolder((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          items: [...prev.items, newFile],
-        };
-      });
-    });
+    const folder = await getVaultFolder(id);
+    setFolder(folder);
 
     // Reset input
     if (fileInputRef.current) {
@@ -94,6 +81,12 @@ export default function VaultFolderPage() {
 
   const handleOpenFolder = (childFolderId: string) => {
     router.push(`/dashboard/vault/${childFolderId}`);
+  };
+
+  const handleDownloadFile = (item: VaultItem) => {
+    // TODO: Implement file download
+    console.log("Downloading file:", item.name);
+    // You can use the item.id to download from backend
   };
 
   const handleGoBack = () => {
@@ -122,24 +115,44 @@ export default function VaultFolderPage() {
         {sortedItems.map((item) => (
           <div
             key={item.id}
-            onClick={() => item.type === "folder" && handleOpenFolder(item.id)}
-            className={item.type === "folder" ? "cursor-pointer" : ""}
+            className={`group flex items-center gap-2 ${
+              item.type === "folder" ? "cursor-pointer" : ""
+            }`}
           >
-            <Item variant="outline" className="hover:bg-accent p-3 transition-colors">
-              <ItemMedia variant="icon" className="text-blue-500">
-                {item.type === "folder" ? (
-                  <Folder className="h-6 w-6" />
-                ) : (
-                  <File className="h-6 w-6" />
-                )}
-              </ItemMedia>
-              <ItemContent className="gap-1">
-                <ItemTitle className="line-clamp-2 text-sm">{item.name}</ItemTitle>
-                <p className="text-xs text-gray-500">
-                  {item.type === "file" ? formatFileSize(item.size || 0) : "Folder"}
-                </p>
-              </ItemContent>
-            </Item>
+            <div
+              onClick={() => item.type === "folder" && handleOpenFolder(item.id)}
+              className="flex-1"
+            >
+              <Item variant="outline" className="hover:bg-accent p-3 transition-colors">
+                <ItemMedia variant="icon" className="text-blue-500">
+                  {item.type === "folder" ? (
+                    <Folder className="h-6 w-6" />
+                  ) : (
+                    <File className="h-6 w-6" />
+                  )}
+                </ItemMedia>
+                <ItemContent className="gap-1">
+                  <ItemTitle className="line-clamp-2 text-sm">{item.name}</ItemTitle>
+                  <p className="text-xs text-gray-500">
+                    {item.type === "file" ? formatFileSize(item.size || 0) : "Folder"}
+                  </p>
+                </ItemContent>
+                <ItemActions>
+                  {item.type === "file" && (
+                    <Button
+                      onClick={() => handleDownloadFile(item)}
+                      variant="outline"
+                      size="icon"
+                      className="opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
+                </ItemActions>
+              </Item>
+            </div>
+
+            {/* Download Button for Files */}
           </div>
         ))}
       </div>
