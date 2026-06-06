@@ -7,7 +7,7 @@ export interface VaultItem {
 }
 
 export interface VaultFolder {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
     items: VaultItem[];
 }
