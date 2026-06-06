@@ -1,6 +1,7 @@
 import axios from "axios";
 
 import { GroupCreateData, GroupInviteData } from "@/app/schemas/groups";
+import { UserData, userSchema } from "@/app/schemas/user";
 
 import { privateApiClient } from "./private";
 
@@ -31,4 +32,9 @@ export async function getInviteCodeRequest(): Promise<string> {
 
 export async function leaveGroupRequest() {
     await privateApiClient.post("/groups/leave");
+}
+
+export async function getGroupMembersRequest(): Promise<UserData[]> {
+    const { data } = await privateApiClient.get("/groups/users");
+    return data.map((e: any) => userSchema.decode(e));
 }

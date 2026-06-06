@@ -1,11 +1,10 @@
 import axios from "axios";
-import z from "zod";
 
-import { userSchema } from "@/app/schemas/user";
+import { UserData, userSchema } from "@/app/schemas/user";
 
 import { privateApiClient } from "./private";
 
-export async function getMeRequest(): Promise<z.infer<typeof userSchema>> {
+export async function getMeRequest(): Promise<UserData> {
     const { data } = await axios.get(`/api/users/me`, { withCredentials: true });
     return userSchema.decode(data.data);
 }

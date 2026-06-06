@@ -9,7 +9,7 @@ interface TaskPopoverProps {
   taskTitle: string;
   openPopover: string | null;
   setOpenPopover: (value: string | null) => void;
-  handleAddTask: (groupKey: string) => void;
+  handleAddTask: () => void;
   setTaskTitle: (value: string) => void;
 }
 
@@ -40,11 +40,11 @@ export default function TaskPopover({
             onChange={(e) => setTaskTitle(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleAddTask(groupKey);
+                handleAddTask();
               }
             }}
           />
-          <Button onClick={() => handleAddTask(groupKey)} className="w-full" size="sm">
+          <Button onClick={() => handleAddTask()} className="w-full" size="sm">
             Добавить задачу
           </Button>
         </div>

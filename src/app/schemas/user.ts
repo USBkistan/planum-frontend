@@ -1,5 +1,7 @@
 import z from "zod";
 
+export type UserData = z.infer<typeof userSchema>;
+
 export const userSchema = z.object({
     id: z.uuidv4(),
     group_id: z.uuidv4().nullable(),

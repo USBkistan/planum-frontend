@@ -7,7 +7,7 @@ import { Item, ItemTitle } from "@/components/ui/item";
 import Task from "@/components/web/task";
 import TaskPopover from "@/components/web/task-popover";
 import TaskSidebar from "@/components/web/task-sidebar";
-import { getTasks } from "@/services/tasks";
+import { createTask, getTasks, updateTask } from "@/services/tasks";
 
 export default function BoardPage() {
   const [tasks, setTasks] = useState<TasksState>({
@@ -76,21 +76,13 @@ export default function BoardPage() {
     setDraggedTask(null);
   };
 
-  const handleAddTask = (groupKey: string) => {
+  const handleAddTask = async () => {
     if (!taskTitle.trim()) return;
 
-    const newTask: TaskData = {
-      id: Date.now().toString(),
-      title: taskTitle,
-      assignee: "Unassigned",
-      priority: "medium",
-      description: "Default description for new task.",
-    };
+    await createTask(taskTitle);
 
-    setTasks((prev) => ({
-      ...prev,
-      [groupKey]: [...prev[groupKey as keyof typeof prev], newTask],
-    }));
+    const tasksState = await getTasks();
+    setTasks(tasksState);
 
     setTaskTitle("");
     setOpenPopover(null);
@@ -101,18 +93,10 @@ export default function BoardPage() {
     setSidebarOpen(true);
   };
 
-  const handleTaskUpdate = (updatedTask: TaskData) => {
-    setTasks((prev) => {
-      const newTasks = { ...prev };
-      for (const key in newTasks) {
-        const index = newTasks[key as keyof typeof prev].findIndex((t) => t.id === updatedTask.id);
-        if (index !== -1) {
-          newTasks[key as keyof typeof prev][index] = updatedTask;
-          break;
-        }
-      }
-      return newTasks;
-    });
+  const handleTaskUpdate = async (updatedTask: TaskData) => {
+    await updateTask(updatedTask);
+    const tasksState = await getTasks();
+    setTasks(tasksState);
   };
 
   const renderTasksColumn = (groupKey: string, groupLabel: string, taskList: TaskData[]) => (
@@ -151,7 +135,13 @@ export default function BoardPage() {
               title={task.title}
               description={task.description}
               assignee={task.assignee}
+              assignee_id={task.assignee_id}
               priority={task.priority}
+              status={task.status}
+              created_by={task.created_by}
+              group_id={task.group_id}
+              created_at={task.created_at}
+              updated_at={task.updated_at}
             />
           </div>
         ))}

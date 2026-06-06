@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { TaskData } from "@/app/schemas/tasks";
+import { UserData } from "@/app/schemas/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { getGroupMembersRequest } from "@/services/groups";
 
 interface TaskSidebarProps {
   task: TaskData | null;
@@ -30,6 +32,22 @@ interface TaskSidebarProps {
 
 export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: TaskSidebarProps) {
   const [editedTask, setEditedTask] = useState<TaskData | null>(task);
+  const [groupMembers, setGroupMembers] = useState<UserData[]>([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      const members = await getGroupMembersRequest();
+      setGroupMembers(members);
+    };
+
+    fetchData();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   useEffect(() => {
     setEditedTask(task);
@@ -65,12 +83,21 @@ export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: Tas
 
           <div className="space-y-2">
             <Label htmlFor="assignee">Assignee</Label>
-            <Input
-              id="assignee"
-              value={editedTask.assignee}
-              onChange={(e) => setEditedTask({ ...editedTask, assignee: e.target.value })}
-              placeholder="Enter assignee name"
-            />
+            <Select
+              value={editedTask.assignee ? editedTask.assignee : ""}
+              onValueChange={(value) => setEditedTask({ ...editedTask, assignee_id: value })}
+            >
+              <SelectTrigger id="assignee">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {groupMembers.map((member) => (
+                  <SelectItem key={member.id} value={member.id}>
+                    {member.display_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
