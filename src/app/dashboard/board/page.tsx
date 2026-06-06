@@ -31,47 +31,34 @@ export default function BoardPage() {
     };
   }, []);
 
-  const [draggedTask, setDraggedTask] = useState<{ taskId: string; sourceGroup: string } | null>(
-    null,
-  );
+  const [draggedTask, setDraggedTask] = useState<TaskData | null>(null);
 
   const [taskTitle, setTaskTitle] = useState("");
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskData | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleDragStart = (taskId: string, sourceGroup: string) => {
-    setDraggedTask({ taskId, sourceGroup });
+  const handleDragStart = (task: TaskData) => {
+    setDraggedTask(task);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
-  const handleDrop = (targetGroup: string) => {
+  const handleDrop = async (targetGroup: "open" | "progress" | "closed") => {
     if (!draggedTask) return;
 
-    const { taskId, sourceGroup } = draggedTask;
-
-    if (sourceGroup === targetGroup) {
+    if (draggedTask.status === targetGroup) {
       setDraggedTask(null);
       return;
     }
 
-    setTasks((prev) => {
-      const sourceList = prev[sourceGroup as keyof typeof prev] || [];
-      const targetList = prev[targetGroup as keyof typeof prev] || [];
+    draggedTask.status = targetGroup;
+    await updateTask(draggedTask);
 
-      const taskToMove = sourceList.find((t) => t.id === taskId);
-
-      if (!taskToMove) return prev;
-
-      return {
-        ...prev,
-        [sourceGroup]: sourceList.filter((t) => t.id !== taskId),
-        [targetGroup]: [...targetList, taskToMove],
-      };
-    });
+    const tasksState = await getTasks();
+    setTasks(tasksState);
 
     setDraggedTask(null);
   };
@@ -99,61 +86,67 @@ export default function BoardPage() {
     setTasks(tasksState);
   };
 
-  const renderTasksColumn = (groupKey: string, groupLabel: string, taskList: TaskData[]) => (
-    <Item
-      variant={"outline"}
-      className="flex max-h-full min-h-0 flex-1 flex-col items-start gap-2.5 p-3"
-    >
-      <div className="flex w-full items-center gap-2">
-        <ItemTitle>{groupLabel}</ItemTitle>
-        {groupKey === "open" && (
-          <TaskPopover
-            groupKey={groupKey}
-            taskTitle={taskTitle}
-            openPopover={openPopover}
-            setOpenPopover={setOpenPopover}
-            handleAddTask={handleAddTask}
-            setTaskTitle={setTaskTitle}
-          />
-        )}
-      </div>
-      <div
-        className="flex w-full flex-1 flex-col gap-2.5 overflow-y-auto"
-        onDragOver={handleDragOver}
-        onDrop={() => handleDrop(groupKey)}
+  const renderTasksColumn = (
+    groupKey: "open" | "progress" | "closed",
+    groupLabel: string,
+    taskList: TaskData[],
+  ) => {
+    return (
+      <Item
+        variant={"outline"}
+        className="flex max-h-full min-h-0 flex-1 flex-col items-start gap-2.5 p-3"
       >
-        {taskList.map((task) => (
-          <div
-            key={task.id}
-            draggable
-            onDragStart={() => handleDragStart(task.id, groupKey)}
-            onClick={() => handleTaskClick(task)}
-            className="w-full shrink-0 cursor-move"
-          >
-            <Task
-              id={task.id}
-              title={task.title}
-              description={task.description}
-              assignee={task.assignee}
-              assignee_id={task.assignee_id}
-              priority={task.priority}
-              status={task.status}
-              created_by={task.created_by}
-              group_id={task.group_id}
-              created_at={task.created_at}
-              updated_at={task.updated_at}
+        <div className="flex w-full items-center gap-2">
+          <ItemTitle>{groupLabel}</ItemTitle>
+          {groupKey === "open" && (
+            <TaskPopover
+              groupKey={groupKey}
+              taskTitle={taskTitle}
+              openPopover={openPopover}
+              setOpenPopover={setOpenPopover}
+              handleAddTask={handleAddTask}
+              setTaskTitle={setTaskTitle}
             />
-          </div>
-        ))}
-      </div>
-    </Item>
-  );
+          )}
+        </div>
+        <div
+          className="flex w-full flex-1 flex-col gap-2.5 overflow-y-auto"
+          onDragOver={handleDragOver}
+          onDrop={() => handleDrop(groupKey)}
+        >
+          {taskList.map((task) => (
+            <div
+              key={task.id}
+              draggable
+              onDragStart={() => handleDragStart(task)}
+              onClick={() => handleTaskClick(task)}
+              className="w-full shrink-0 cursor-move"
+            >
+              <Task
+                id={task.id}
+                title={task.title}
+                description={task.description}
+                assignee={task.assignee}
+                assignee_id={task.assignee_id}
+                priority={task.priority}
+                status={task.status}
+                created_by={task.created_by}
+                group_id={task.group_id}
+                created_at={task.created_at}
+                updated_at={task.updated_at}
+              />
+            </div>
+          ))}
+        </div>
+      </Item>
+    );
+  };
 
   return (
     <>
       <div className="flex h-full w-full flex-row justify-between gap-5 p-5">
         {renderTasksColumn("open", "Открыто", tasks.open)}
-        {renderTasksColumn("inProgress", "В работе", tasks.inProgress)}
+        {renderTasksColumn("progress", "В работе", tasks.inProgress)}
         {renderTasksColumn("closed", "Закрыто", tasks.closed)}
       </div>
       <TaskSidebar

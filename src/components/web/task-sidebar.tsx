@@ -33,6 +33,7 @@ interface TaskSidebarProps {
 export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: TaskSidebarProps) {
   const [editedTask, setEditedTask] = useState<TaskData | null>(task);
   const [groupMembers, setGroupMembers] = useState<UserData[]>([]);
+  const [selectedName, setSelectedName] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -51,6 +52,7 @@ export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: Tas
 
   useEffect(() => {
     setEditedTask(task);
+    setSelectedName(task?.assignee!);
   }, [task]);
 
   const handleSave = () => {
@@ -85,10 +87,18 @@ export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: Tas
             <Label htmlFor="assignee">Assignee</Label>
             <Select
               value={editedTask.assignee ? editedTask.assignee : ""}
-              onValueChange={(value) => setEditedTask({ ...editedTask, assignee_id: value })}
+              onValueChange={(value) => {
+                const member = groupMembers.find((e) => e.id == value);
+                setSelectedName(member?.display_name!);
+                setEditedTask({ ...editedTask, assignee_id: value });
+              }}
             >
               <SelectTrigger id="assignee">
-                <SelectValue />
+                {selectedName ? (
+                  <SelectValue>{selectedName}</SelectValue>
+                ) : (
+                  <SelectValue>Выберите пользователя</SelectValue>
+                )}
               </SelectTrigger>
               <SelectContent>
                 {groupMembers.map((member) => (
