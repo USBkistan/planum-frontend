@@ -1,11 +1,10 @@
-import { VaultFolder } from "@/app/schemas/vault";
+import { VaultFolder, VaultItem } from "@/app/schemas/vault";
 
 import { privateApiClient } from "./private";
 
 export async function getVaultFolder(folderId: string | null): Promise<VaultFolder> {
     const path = folderId ? `/vault/dir?dir_id=${folderId}` : "/vault/dir";
     const { data } = await privateApiClient.get(path);
-    console.log(data);
     return data!;
 }
 
@@ -21,6 +20,29 @@ export async function createFolder({
     } catch (error) {
         console.log(error);
     }
+}
+
+export async function downloadFile(file: VaultItem) {
+    const response = await privateApiClient.get(
+        `/vault/files/download?file_id=${file.id}`,
+        {
+            responseType: "blob",
+        },
+    );
+
+    const blob = response.data;
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.name;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
 }
 
 export async function uploadFiles(files: FileList, folderId: string | null) {

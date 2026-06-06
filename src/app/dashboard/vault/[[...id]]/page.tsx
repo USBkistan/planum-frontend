@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { createFolder, getVaultFolder, uploadFiles } from "@/services/vault";
+import { createFolder, downloadFile, getVaultFolder, uploadFiles } from "@/services/vault";
 
 export default function VaultFolderPage() {
   const router = useRouter();
@@ -83,10 +83,9 @@ export default function VaultFolderPage() {
     router.push(`/dashboard/vault/${childFolderId}`);
   };
 
-  const handleDownloadFile = (item: VaultItem) => {
-    // TODO: Implement file download
+  const handleDownloadFile = async (item: VaultItem) => {
+    await downloadFile(item);
     console.log("Downloading file:", item.name);
-    // You can use the item.id to download from backend
   };
 
   const handleGoBack = () => {
