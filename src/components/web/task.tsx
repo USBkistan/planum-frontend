@@ -9,6 +9,12 @@ const priorityColors = {
   high: "bg-red-100 text-red-800",
 };
 
+const priorityTranslations = {
+  low: "Низкий",
+  medium: "Средний",
+  high: "Высокий",
+};
+
 export default function Task({ title, assignee, priority, description }: TaskData) {
   return (
     <Item variant={"outline"} className="p-3">
@@ -18,7 +24,7 @@ export default function Task({ title, assignee, priority, description }: TaskDat
         <div className="flex items-center justify-between gap-2">
           <span className="truncate text-xs text-gray-600">{assignee}</span>
           <Badge className={`shrink-0 text-xs ${priorityColors[priority]}`}>
-            {priority.charAt(0).toUpperCase() + priority.slice(1)}
+            {priorityTranslations[priority]}
           </Badge>
         </div>
       </ItemContent>

@@ -68,23 +68,23 @@ export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: Tas
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="right" className="w-96">
         <SheetHeader>
-          <SheetTitle>Edit Task</SheetTitle>
-          <SheetDescription>Update task details and save your changes.</SheetDescription>
+          <SheetTitle>Изменить задачу</SheetTitle>
+          <SheetDescription>Измените детали задачи и сохраните изменения.</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-6 px-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Название</Label>
             <Input
               id="title"
               value={editedTask.title}
               onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-              placeholder="Enter task title"
+              placeholder="Введите название задачи"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="assignee">Assignee</Label>
+            <Label htmlFor="assignee">Исполнитель</Label>
             <Select
               value={editedTask.assignee ? editedTask.assignee : ""}
               onValueChange={(value) => {
@@ -111,7 +111,7 @@ export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: Tas
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="priority">Priority</Label>
+            <Label htmlFor="priority">Приоритет</Label>
             <Select
               value={editedTask.priority}
               onValueChange={(value) =>
@@ -125,9 +125,9 @@ export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: Tas
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="low">Низкий</SelectItem>
+                <SelectItem value="medium">Средний</SelectItem>
+                <SelectItem value="high">Высокий</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -135,10 +135,10 @@ export default function TaskSidebar({ task, isOpen, onClose, onTaskUpdate }: Tas
 
         <div className="flex gap-2 px-4 py-4">
           <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancel
+            Отменить
           </Button>
           <Button onClick={handleSave} className="flex-1">
-            Save Changes
+            Сохранить изменения
           </Button>
         </div>
       </SheetContent>

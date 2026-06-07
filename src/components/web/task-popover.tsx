@@ -33,9 +33,9 @@ export default function TaskPopover({
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
-          <h4 className="text-sm font-medium">Add New Task</h4>
+          <h4 className="text-sm font-medium">Создать новую задачу</h4>
           <Input
-            placeholder="Task title..."
+            placeholder="Название задачи..."
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
             onKeyDown={(e) => {
