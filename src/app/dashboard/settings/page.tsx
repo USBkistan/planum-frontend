@@ -58,7 +58,7 @@ export default function SettingsPage() {
 
   const handleChangeName = async () => {
     if (!name.trim()) {
-      showMessage("error", "Name cannot be empty");
+      showMessage("error", "Имя не может быть пустым");
       return;
     }
 
@@ -66,9 +66,9 @@ export default function SettingsPage() {
     try {
       updateNameRequest(name);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      showMessage("success", "Name updated successfully");
+      showMessage("success", "Имя успешно обновлено");
     } catch (error) {
-      showMessage("error", "Failed to update name");
+      showMessage("error", "Не удалось обновить имя");
     } finally {
       setLoading(false);
     }
@@ -76,17 +76,17 @@ export default function SettingsPage() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      showMessage("error", "All password fields are required");
+      showMessage("error", "Все поля обязательны для заполнения");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      showMessage("error", "Passwords do not match");
+      showMessage("error", "Пароли не совпадают");
       return;
     }
 
     if (newPassword.length < 8) {
-      showMessage("error", "Password must be at least 8 characters");
+      showMessage("error", "Пароль должен содержать как минимум 8 символов");
       return;
     }
 
@@ -97,9 +97,9 @@ export default function SettingsPage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      showMessage("success", "Password changed successfully");
+      showMessage("success", "Пароль успешно изменен");
     } catch (error) {
-      showMessage("error", "Failed to change password");
+      showMessage("error", "Не удалось изменить пароль");
     } finally {
       setLoading(false);
     }
@@ -107,7 +107,7 @@ export default function SettingsPage() {
 
   const handleCopyGroupCode = () => {
     navigator.clipboard.writeText(groupCode);
-    showMessage("success", "Group code copied to clipboard");
+    showMessage("success", "Код группы скопирован в буфер обмена");
   };
 
   const handleLeaveGroup = async () => {
@@ -116,10 +116,10 @@ export default function SettingsPage() {
       await leaveGroupRequest();
       Cookies.remove("group_id");
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      showMessage("success", "You have left the group");
+      showMessage("success", "Вы покинули группу");
       router.push("/");
     } catch (error) {
-      showMessage("error", "Failed to leave group");
+      showMessage("error", "Не удалось покинуть группу");
     } finally {
       setLoading(false);
     }
@@ -128,8 +128,8 @@ export default function SettingsPage() {
   return (
     <div className="flex h-full flex-col gap-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-gray-600">Manage your account and preferences</p>
+        <h1 className="text-3xl font-bold">Настройки</h1>
+        <p className="text-gray-600">Управление вашей учетной записью</p>
       </div>
 
       {/* Message Alert */}
@@ -147,20 +147,20 @@ export default function SettingsPage() {
         {/* Change Name */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Change Name</CardTitle>
+            <CardTitle className="text-lg">Изменить имя</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Your Name</Label>
+              <Label htmlFor="name">Ваше имя</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
+                placeholder="Введите ваше имя"
               />
             </div>
             <Button onClick={handleChangeName} disabled={loading}>
-              Save Name
+              Изменить имя
             </Button>
           </CardContent>
         </Card>
@@ -168,19 +168,19 @@ export default function SettingsPage() {
         {/* Change Password */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Change Password</CardTitle>
+            <CardTitle className="text-lg">Изменить пароль</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Current Password */}
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
+              <Label htmlFor="currentPassword">Текущий пароль</Label>
               <div className="relative">
                 <Input
                   id="currentPassword"
                   type={showPassword ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter current password"
+                  placeholder="Введите текущий пароль"
                 />
                 <button
                   type="button"
@@ -194,26 +194,26 @@ export default function SettingsPage() {
 
             {/* New Password */}
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">Новый пароль</Label>
               <Input
                 id="newPassword"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password (min 8 characters)"
+                placeholder="Введите новый пароль (минимум 8 символов)"
               />
             </div>
 
             {/* Confirm Password */}
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Подтвердить пароль</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
+                  placeholder="Подтвердите новый пароль"
                 />
                 <button
                   type="button"
@@ -230,7 +230,7 @@ export default function SettingsPage() {
             </div>
 
             <Button onClick={handleChangePassword} disabled={loading}>
-              Change Password
+              Изменить пароль
             </Button>
           </CardContent>
         </Card>
@@ -238,14 +238,14 @@ export default function SettingsPage() {
         {/* Group Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Group Settings</CardTitle>
+            <CardTitle className="text-lg">Настройки группы</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Group Code */}
             <div className="space-y-2">
-              <Label>Group Code</Label>
+              <Label>Код группы</Label>
               <div className="flex gap-2">
-                <Input value={groupCode} readOnly placeholder="Group code not available" />
+                <Input value={groupCode} readOnly placeholder="Код группы недоступен" />
                 <Button onClick={handleCopyGroupCode} variant="outline" size="icon">
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -257,21 +257,22 @@ export default function SettingsPage() {
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" className="w-full" disabled={loading}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  Leave Group
+                  Покинуть группу
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
-                <AlertDialogTitle>Leave Group?</AlertDialogTitle>
+                <AlertDialogTitle>Покинуть группу?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to leave this group? This action cannot be undone.
+                  Вы уверены, что хотите покинуть группу? Вы потеряете доступ ко всем данным и
+                  задачам, связанным с этой группой. Это действие нельзя отменить.
                 </AlertDialogDescription>
                 <div className="flex gap-3">
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>Отменить</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleLeaveGroup}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Leave Group
+                    Покинуть группу
                   </AlertDialogAction>
                 </div>
               </AlertDialogContent>
