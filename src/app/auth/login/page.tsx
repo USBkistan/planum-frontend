@@ -1,7 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { loginSchema } from "@/app/schemas/auth";
@@ -16,6 +18,7 @@ import { getMeRequest } from "@/services/user";
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth()!;
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -64,7 +67,21 @@ export default function LoginPage() {
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>Пароль</FieldLabel>
-                  <Input aria-invalid={fieldState.invalid} placeholder="********" {...field} />
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="********"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-2.5 right-3 text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
