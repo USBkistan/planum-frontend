@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
 import { registerSchema } from "@/app/schemas/auth";
@@ -14,6 +14,7 @@ import { registerRequest } from "@/services/auth";
 import { getMeRequest } from "@/services/user";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const { login } = useAuth()!;
 
   const form = useForm({
@@ -83,6 +84,17 @@ export default function RegisterPage() {
             <Button>Зарегистрироваться</Button>
           </FieldGroup>
         </form>
+        <div className="mt-4 text-center">
+          <p className="mb-2 text-sm text-gray-600">Уже есть аккаунт?</p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/auth/login")}
+            className="w-full"
+          >
+            Перейти к входу
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
 import { loginSchema } from "@/app/schemas/auth";
@@ -14,6 +14,7 @@ import { loginRequest } from "@/services/auth";
 import { getMeRequest } from "@/services/user";
 
 export default function LoginPage() {
+  const router = useRouter();
   const { login } = useAuth()!;
 
   const form = useForm({
@@ -71,6 +72,17 @@ export default function LoginPage() {
             <Button>Войти</Button>
           </FieldGroup>
         </form>
+        <div className="mt-4 text-center">
+          <p className="mb-2 text-sm text-gray-600">Нет аккаунта?</p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/auth/register")}
+            className="w-full"
+          >
+            Перейти к регистрации
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
