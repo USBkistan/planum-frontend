@@ -1,2 +1,2 @@
-export const serverUrl = "http://127.0.0.1:8000/v1";
-export const wsServerUrl = "ws://127.0.0.1:8000/v1";
+export const serverUrl = process.env.NEXT_PUBLIC_BACKEND_SERVER!;
+export const wsServerUrl = process.env.NEXT_PUBLIC_BACKEND_WS_SERVER!;
