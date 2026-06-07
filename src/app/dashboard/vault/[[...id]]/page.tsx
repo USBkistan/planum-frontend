@@ -179,14 +179,14 @@ export default function VaultFolderPage() {
             <PopoverTrigger asChild>
               <Button size="sm" variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
-                New Folder
+                Новая папка
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-64">
               <div className="space-y-3">
-                <h4 className="text-sm font-medium">Create Folder</h4>
+                <h4 className="text-sm font-medium">Создать папку</h4>
                 <Input
-                  placeholder="Folder name..."
+                  placeholder="Имя папки..."
                   value={newFolderName}
                   onChange={(e) => setNewFolderName(e.target.value)}
                   onKeyDown={(e) => {
@@ -196,7 +196,7 @@ export default function VaultFolderPage() {
                   }}
                 />
                 <Button onClick={handleCreateFolder} className="w-full" size="sm">
-                  Create
+                  Создать
                 </Button>
               </div>
             </PopoverContent>
@@ -210,12 +210,12 @@ export default function VaultFolderPage() {
             <PopoverTrigger asChild>
               <Button size="sm" variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
-                Upload File
+                Загрузить файлы
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-64">
               <div className="space-y-3">
-                <h4 className="text-sm font-medium">Upload File</h4>
+                <h4 className="text-sm font-medium">Загрузить файлы</h4>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -230,9 +230,11 @@ export default function VaultFolderPage() {
                   size="sm"
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  Choose Files
+                  Выбрать файлы
                 </Button>
-                <p className="text-xs text-gray-500">You can select multiple files at once</p>
+                <p className="text-xs text-gray-500">
+                  Вы можете выбрать несколько файлов одновременно
+                </p>
               </div>
             </PopoverContent>
           </Popover>
