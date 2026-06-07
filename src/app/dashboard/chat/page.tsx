@@ -98,6 +98,15 @@ export default function ChatPage() {
     }
   };
 
+  const formatDatetime = (date: Date) => {
+    const day = date.getDay().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
+  };
+
   const renderMessages = () => {
     return (
       <>
@@ -125,7 +134,7 @@ export default function ChatPage() {
                       message.user_id === currentUser ? "text-blue-100" : "text-gray-600"
                     }`}
                   >
-                    {new Date(message.created_at).toLocaleTimeString()}
+                    {formatDatetime(new Date(message.created_at))}
                   </p>
                 </div>
               </div>
@@ -140,7 +149,7 @@ export default function ChatPage() {
     <div className="flex h-full flex-col p-6">
       <Card className="flex flex-1 flex-col overflow-hidden">
         <CardHeader>
-          <CardTitle>Chat</CardTitle>
+          <CardTitle>Чат</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden p-4">
           {/* Messages */}
@@ -156,7 +165,7 @@ export default function ChatPage() {
           {/* Input */}
           <div className="flex gap-2">
             <Input
-              placeholder="Type your message..."
+              placeholder="Введите ваше сообщение..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
