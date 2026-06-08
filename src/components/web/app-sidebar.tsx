@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import {
   Sidebar,
@@ -18,6 +18,7 @@ import { ThemeToggle } from "./theme-toggle";
 export function AppSidebar() {
   const { isAuthenticated, logout } = useAuth()!;
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (href: string) => pathname.includes(href);
   return (
@@ -78,7 +79,7 @@ export function AppSidebar() {
             variant={"secondary"}
             onClick={() => {
               logout();
-              redirect("/");
+              router.push("/");
             }}
           >
             Выйти

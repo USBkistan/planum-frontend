@@ -117,7 +117,7 @@ export default function SettingsPage() {
       Cookies.remove("group_id");
       await new Promise((resolve) => setTimeout(resolve, 1000));
       showMessage("success", "Вы покинули группу");
-      router.push("/");
+      router.push("/group");
     } catch (error) {
       showMessage("error", "Не удалось покинуть группу");
     } finally {
