@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -32,8 +32,12 @@ export default function LoginPage() {
     const auth = (await loginRequest(payload))!;
     if (auth) {
       login(auth.access_token, auth.refresh_token);
-      await getMeRequest();
-      redirect("/");
+      const data = await getMeRequest();
+      if (data.group_id) {
+        router.push("/dashboard/board");
+      } else {
+        router.push("/group");
+      }
     }
   }
 
