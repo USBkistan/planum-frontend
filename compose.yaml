@@ -3,6 +3,9 @@ services:
     build: .
     container_name: frontend_server
     command: ["npm", "run", "start"]
+    environment:
+      - NEXT_PUBLIC_BACKEND_SERVER=${NEXT_PUBLIC_BACKEND_SERVER}
+      - NEXT_PUBLIC_BACKEND_WS_SERVER=${NEXT_PUBLIC_BACKEND_WS_SERVER}
     env_file:
       - .env
     ports:

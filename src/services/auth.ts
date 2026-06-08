@@ -7,7 +7,7 @@ import { serverUrl } from "./globals";
 
 const apiClient = axios.create({
     baseURL: serverUrl,
-    timeout: 1000,
+    timeout: 10000,
 });
 
 interface AuthResponse {
