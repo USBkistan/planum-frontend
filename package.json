@@ -39,13 +39,5 @@
         "oxfmt": "^0.46.0",
         "tailwindcss": "^4",
         "typescript": "^5"
-    },
-    "ignoreScripts": [
-        "sharp",
-        "unrs-resolver"
-    ],
-    "trustedDependencies": [
-        "sharp",
-        "unrs-resolver"
-    ]
+    }
 }

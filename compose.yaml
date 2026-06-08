@@ -2,7 +2,7 @@ services:
   app:
     build: .
     container_name: frontend_server
-    command: ["bun", "run", "start"]
+    command: ["npm", "run", "start"]
     env_file:
       - .env
     ports:
