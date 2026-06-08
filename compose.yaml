@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    container_name: frontend_server
+    command: ["bun", "run", "start"]
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    deploy:
+      resources:
+        limits:
+          cpus: '${FRONTEND_CPUS}'
+          memory: ${FRONTEND_MEMORY}
