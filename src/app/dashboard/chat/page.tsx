@@ -2,7 +2,7 @@
 
 import Cookies from "js-cookie";
 import { Send } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 
 import { ChatMessage } from "@/app/schemas/chat";
@@ -22,6 +22,7 @@ export default function ChatPage() {
   const [currentUser, setCurrentUser] = useState("");
   const [currentGroup, setCurrentGroup] = useState("");
   const [currentUserName, setCurrentIUserName] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function ChatPage() {
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch chat messages:", error);
+        setLoading(false);
       }
     };
 
@@ -72,7 +74,9 @@ export default function ChatPage() {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isSending) return;
+
+    setIsSending(true);
 
     const newMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -83,12 +87,21 @@ export default function ChatPage() {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    await sendChatMessage(inputValue);
 
-    if (socket) socket.send(JSON.stringify(newMessage));
+    try {
+      await sendChatMessage(inputValue);
 
-    setMessages((prev) => [...prev, newMessage]);
-    setInputValue("");
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(newMessage));
+      }
+
+      setMessages((prev) => [...prev, newMessage]);
+      setInputValue("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -115,20 +128,22 @@ export default function ChatPage() {
             <div
               className={`flex ${message.user_id === currentUser ? "justify-end" : "justify-start"}`}
             >
-              <div className="space-y-1">
+              <div className="max-w-sm space-y-1">
                 <p
-                  className={`text-xs font-semibold ${message.user_id === currentUser ? "text-right" : "text-left"} text-gray-600`}
+                  className={`text-xs font-semibold ${
+                    message.user_id === currentUser ? "text-right" : "text-left"
+                  } text-gray-600`}
                 >
                   {message.name}
                 </p>
                 <div
-                  className={`max-w-xs rounded-lg px-4 py-2 ${
+                  className={`rounded-lg px-4 py-2 wrap-break-word ${
                     message.user_id === currentUser
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200 text-gray-900"
                   }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                   <p
                     className={`mt-1 text-xs ${
                       message.user_id === currentUser ? "text-blue-100" : "text-gray-600"
@@ -169,8 +184,13 @@ export default function ChatPage() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={isSending}
             />
-            <Button onClick={handleSendMessage} disabled={!inputValue.trim()} size="icon">
+            <Button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || isSending}
+              size="icon"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </div>

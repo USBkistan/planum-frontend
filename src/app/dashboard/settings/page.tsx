@@ -1,7 +1,7 @@
 "use client";
 
 import Cookies from "js-cookie";
-import { Copy, Eye, EyeOff, LogOut } from "lucide-react";
+import { Copy, Check, Eye, EyeOff, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -31,6 +31,7 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
@@ -105,9 +106,32 @@ export default function SettingsPage() {
     }
   };
 
-  const handleCopyGroupCode = () => {
-    navigator.clipboard.writeText(groupCode);
-    showMessage("success", "Код группы скопирован в буфер обмена");
+  const handleCopyGroupCode = async () => {
+    try {
+      // Try modern Clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(groupCode);
+      } else {
+        // Fallback for non-secure contexts
+        const textArea = document.createElement("textarea");
+        textArea.value = groupCode;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+
+      setCopied(true);
+      showMessage("success", "Код группы скопирован в буфер обмена");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showMessage("error", "Не удалось скопировать код группы");
+    }
   };
 
   const handleLeaveGroup = async () => {
@@ -246,8 +270,17 @@ export default function SettingsPage() {
               <Label>Код группы</Label>
               <div className="flex gap-2">
                 <Input value={groupCode} readOnly placeholder="Код группы недоступен" />
-                <Button onClick={handleCopyGroupCode} variant="outline" size="icon">
-                  <Copy className="h-4 w-4" />
+                <Button
+                  onClick={handleCopyGroupCode}
+                  variant="outline"
+                  size="icon"
+                  title="Копировать код"
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
