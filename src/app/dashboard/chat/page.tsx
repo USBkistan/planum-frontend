@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import React from "react";
 
 import { ChatMessage } from "@/app/schemas/chat";
+import { SocketMessage } from "@/app/schemas/socket";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,8 +34,8 @@ export default function ChatPage() {
 
     ws.onmessage = (event) => {
       try {
-        const newMessage: ChatMessage = JSON.parse(event.data);
-        setMessages((prev) => [...prev, newMessage]);
+        const socketMessage: SocketMessage = JSON.parse(event.data);
+        setMessages((prev) => [...prev, socketMessage.payload]);
       } catch (error) {
         console.log(event.data);
       }
@@ -63,6 +64,8 @@ export default function ChatPage() {
 
     fetchData();
 
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+
     return () => {
       ws.close();
     };
@@ -79,7 +82,7 @@ export default function ChatPage() {
     setIsSending(true);
 
     const newMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: `${currentUser}-${Date.now().toString()}`,
       user_id: currentUser,
       group_id: currentGroup,
       name: currentUserName,
@@ -88,14 +91,19 @@ export default function ChatPage() {
       updated_at: new Date().toISOString(),
     };
 
+    const socketMessage = {
+      type: "new_message",
+      payload: newMessage,
+    };
+
     try {
       await sendChatMessage(inputValue);
 
       if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify(newMessage));
+        socket.send(JSON.stringify(socketMessage));
       }
 
-      setMessages((prev) => [...prev, newMessage]);
+      // setMessages((prev) => [...prev, newMessage]);
       setInputValue("");
     } catch (error) {
       console.error("Failed to send message:", error);
