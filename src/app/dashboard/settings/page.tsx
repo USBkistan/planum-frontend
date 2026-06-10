@@ -38,11 +38,13 @@ export default function SettingsPage() {
     const controller = new AbortController();
 
     const fetchData = async () => {
+      setLoading(true);
       const code = await getInviteCodeRequest();
       setGroupCode(code);
 
       const user = await getMeRequest();
       setName(user.display_name);
+      setLoading(false);
     };
 
     fetchData();
@@ -178,7 +180,8 @@ export default function SettingsPage() {
               <Label htmlFor="name">Ваше имя</Label>
               <Input
                 id="name"
-                value={name}
+                value={loading ? "Загрузка..." : name}
+                disabled={loading}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Введите ваше имя"
               />
@@ -269,7 +272,12 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label>Код группы</Label>
               <div className="flex gap-2">
-                <Input value={groupCode} readOnly placeholder="Код группы недоступен" />
+                <Input
+                  value={groupCode}
+                  disabled={loading}
+                  readOnly
+                  placeholder="Код группы недоступен"
+                />
                 <Button
                   onClick={handleCopyGroupCode}
                   variant="outline"
