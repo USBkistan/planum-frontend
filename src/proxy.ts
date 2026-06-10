@@ -2,36 +2,33 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
-    const token = request.cookies.get("access_token");
-    const groupId = request.cookies.get("group_id");
-    const hasGroup =
-        groupId?.value !== undefined &&
-        groupId?.value !== "null" &&
-        groupId?.value !== "";
+    const token = request.cookies.get("access_token")?.value;
+    const groupId = request.cookies.get("group_id")?.value;
 
-    if (!token) {
-        if (
-            request.nextUrl.pathname !== "/" &&
-            request.nextUrl.pathname !== "/auth/login" &&
-            request.nextUrl.pathname !== "/auth/register"
-        ) {
-            return NextResponse.redirect(new URL("/auth/login", request.url));
-        }
+    const hasToken = !!token && token.length > 0;
+    const hasGroup = !!groupId && groupId !== "null" && groupId.length > 0;
+
+    const pathname = request.nextUrl.pathname;
+    const isPublicPage =
+        pathname === "/" || pathname === "/auth/login" || pathname === "/auth/register";
+    const isGroupPage = pathname === "/group";
+    const isDashboardPage = pathname.startsWith("/dashboard");
+
+    if (!hasToken && !isPublicPage) {
+        return NextResponse.redirect(new URL("/auth/login", request.url));
     }
 
-    if (token) {
-        if (
-            !hasGroup &&
-            request.nextUrl.pathname !== "/" &&
-            request.nextUrl.pathname !== "/group"
-        ) {
-            return NextResponse.redirect(new URL("/group", request.url));
-        }
+    if (hasToken && !hasGroup && isDashboardPage) {
+        return NextResponse.redirect(new URL("/group", request.url));
+    }
+
+    if (hasToken && hasGroup && isGroupPage) {
+        return NextResponse.redirect(new URL("/dashboard/board", request.url));
     }
 
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/", "/dashboard/:path*", "/group", "/auth/login", "/auth/register"],
+    matcher: ["/", "/dashboard/:path*", "/group", "/auth/:path*"],
 };
