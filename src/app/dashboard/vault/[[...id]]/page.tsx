@@ -1,9 +1,11 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { ArrowLeft, Download, File, Folder, Plus, Upload, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { SocketMessage } from "@/app/schemas/socket";
 import type { VaultFolder, VaultItem } from "@/app/schemas/vault";
 import {
   AlertDialog,
@@ -17,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { wsServerUrl } from "@/services/globals";
 import {
   createFolder,
   deleteFolder,
@@ -33,6 +36,7 @@ export default function VaultFolderPage() {
 
   const [folder, setFolder] = useState<VaultFolder | null>(null);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [newFolderName, setNewFolderName] = useState("");
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -43,6 +47,29 @@ export default function VaultFolderPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const access_token = Cookies.get("access_token")!;
+    const ws = new WebSocket(`${wsServerUrl}/tasks?token=${access_token}`);
+
+    ws.onopen = () => console.log("Connected to server");
+
+    ws.onmessage = async (event) => {
+      try {
+        const socketMessage: SocketMessage = JSON.parse(event.data);
+        if (socketMessage.type === "vault_updated") {
+          const folder = await getVaultFolder(id);
+          setFolder(folder);
+        } else {
+          console.log("Received unknown message type:", socketMessage.type);
+        }
+      } catch (error) {
+        console.log(event.data);
+      }
+    };
+
+    ws.onclose = () => console.log("Disconnected from server");
+
+    setSocket(ws);
+
     const fetchFolder = async () => {
       try {
         const folder = await getVaultFolder(id);
@@ -76,8 +103,14 @@ export default function VaultFolderPage() {
 
     await createFolder({ parentId: id, name: name });
 
-    const folder = await getVaultFolder(id);
-    setFolder(folder);
+    const socketMessage = {
+      type: "vault_updated",
+      payload: {},
+    };
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(socketMessage));
+    }
 
     setNewFolderName("");
     setOpenPopover(null);
@@ -115,8 +148,14 @@ export default function VaultFolderPage() {
   const proceedWithUpload = async (files: FileList) => {
     await uploadFiles(files, id);
 
-    const folder = await getVaultFolder(id);
-    setFolder(folder);
+    const socketMessage = {
+      type: "vault_updated",
+      payload: {},
+    };
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(socketMessage));
+    }
 
     // Reset input
     if (fileInputRef.current) {
@@ -160,8 +199,14 @@ export default function VaultFolderPage() {
         await deleteFolder(itemToDelete.id);
       }
 
-      const updatedFolder = await getVaultFolder(id);
-      setFolder(updatedFolder);
+      const socketMessage = {
+        type: "vault_updated",
+        payload: {},
+      };
+
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(socketMessage));
+      }
 
       setShowDeleteDialog(false);
       setItemToDelete(null);

@@ -64,8 +64,6 @@ export default function ChatPage() {
 
     fetchData();
 
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-
     return () => {
       ws.close();
     };
@@ -74,7 +72,7 @@ export default function ChatPage() {
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, loading]);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isSending) return;

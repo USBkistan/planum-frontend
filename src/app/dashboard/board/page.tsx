@@ -1,12 +1,15 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
+import { SocketMessage } from "@/app/schemas/socket";
 import { TaskData, TasksState } from "@/app/schemas/tasks";
 import { Item, ItemTitle } from "@/components/ui/item";
 import Task from "@/components/web/task";
 import TaskPopover from "@/components/web/task-popover";
 import TaskSidebar from "@/components/web/task-sidebar";
+import { wsServerUrl } from "@/services/globals";
 import { createTask, getTasks, updateTask } from "@/services/tasks";
 
 export default function BoardPage() {
@@ -15,9 +18,33 @@ export default function BoardPage() {
     inProgress: [],
     closed: [],
   });
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
+
+    const access_token = Cookies.get("access_token")!;
+    const ws = new WebSocket(`${wsServerUrl}/tasks?token=${access_token}`);
+
+    ws.onopen = () => console.log("Connected to server");
+
+    ws.onmessage = async (event) => {
+      try {
+        const socketMessage: SocketMessage = JSON.parse(event.data);
+        if (socketMessage.type === "tasks_updated") {
+          const tasksState = await getTasks();
+          setTasks(tasksState);
+        } else {
+          console.log("Received unknown message type:", socketMessage.type);
+        }
+      } catch (error) {
+        console.log(event.data);
+      }
+    };
+
+    ws.onclose = () => console.log("Disconnected from server");
+
+    setSocket(ws);
 
     const fetchData = async () => {
       const tasksState = await getTasks();
@@ -57,8 +84,14 @@ export default function BoardPage() {
     draggedTask.status = targetGroup;
     await updateTask(draggedTask);
 
-    const tasksState = await getTasks();
-    setTasks(tasksState);
+    const socketMessage = {
+      type: "tasks_updated",
+      payload: {},
+    };
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(socketMessage));
+    }
 
     setDraggedTask(null);
   };
@@ -68,8 +101,14 @@ export default function BoardPage() {
 
     await createTask(taskTitle);
 
-    const tasksState = await getTasks();
-    setTasks(tasksState);
+    const socketMessage = {
+      type: "tasks_updated",
+      payload: {},
+    };
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(socketMessage));
+    }
 
     setTaskTitle("");
     setOpenPopover(null);
@@ -82,8 +121,15 @@ export default function BoardPage() {
 
   const handleTaskUpdate = async (updatedTask: TaskData) => {
     await updateTask(updatedTask);
-    const tasksState = await getTasks();
-    setTasks(tasksState);
+
+    const socketMessage = {
+      type: "tasks_updated",
+      payload: {},
+    };
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(socketMessage));
+    }
   };
 
   const renderTasksColumn = (
