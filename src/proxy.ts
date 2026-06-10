@@ -20,11 +20,11 @@ export function proxy(request: NextRequest) {
     }
 
     if (token) {
-        if (request.nextUrl.pathname === "/") {
-            return NextResponse.redirect(new URL("/dashboard/board", request.url));
-        }
-
-        if (!hasGroup && request.nextUrl.pathname !== "/group") {
+        if (
+            !hasGroup &&
+            request.nextUrl.pathname !== "/" &&
+            request.nextUrl.pathname !== "/group"
+        ) {
             return NextResponse.redirect(new URL("/group", request.url));
         }
     }
