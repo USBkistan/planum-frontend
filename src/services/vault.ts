@@ -3,7 +3,7 @@ import { VaultFolder, VaultItem } from "@/app/schemas/vault";
 import { privateApiClient } from "./private";
 
 export async function getVaultFolder(folderId: string | null): Promise<VaultFolder> {
-    const path = folderId ? `/vault/dir?dir_id=${folderId}` : "/vault/dir";
+    const path = folderId ? `/vault/folder?folder_id=${folderId}` : "/vault/folder";
     const { data } = await privateApiClient.get(path);
     return data!;
 }
@@ -16,7 +16,10 @@ export async function createFolder({
     name: string;
 }) {
     try {
-        await privateApiClient.post("/vault/dir", { parent_id: parentId, name: name });
+        await privateApiClient.post("/vault/folder", {
+            parent_id: parentId,
+            name: name,
+        });
     } catch (error) {
         console.log(error);
     }
@@ -57,4 +60,12 @@ export async function uploadFiles(files: FileList, folderId: string | null) {
     await privateApiClient.post("/vault/files", formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });
+}
+
+export async function deleteFile(fileId: string) {
+    await privateApiClient.delete(`/vault/files?file_id=${fileId}`);
+}
+
+export async function deleteFolder(folderId: string) {
+    await privateApiClient.delete(`/vault/folder?folder_id=${folderId}`);
 }

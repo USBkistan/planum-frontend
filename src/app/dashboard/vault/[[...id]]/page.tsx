@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Download, File, Folder, Plus, Upload } from "lucide-react";
+import { ArrowLeft, Download, File, Folder, Plus, Upload, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -17,7 +17,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { createFolder, downloadFile, getVaultFolder, uploadFiles } from "@/services/vault";
+import {
+  createFolder,
+  deleteFolder,
+  deleteFile,
+  downloadFile,
+  getVaultFolder,
+  uploadFiles,
+} from "@/services/vault";
 
 export default function VaultFolderPage() {
   const router = useRouter();
@@ -31,6 +38,8 @@ export default function VaultFolderPage() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
   const [duplicateFiles, setDuplicateFiles] = useState<string[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<VaultItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -129,9 +138,36 @@ export default function VaultFolderPage() {
     router.push(`/dashboard/vault/${childFolderId}`);
   };
 
-  const handleDownloadFile = async (item: VaultItem) => {
+  const handleDownloadFile = async (item: VaultItem, e: React.MouseEvent) => {
+    e.stopPropagation();
     await downloadFile(item);
     console.log("Downloading file:", item.name);
+  };
+
+  const handleDeleteItem = (item: VaultItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setItemToDelete(item);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      if (itemToDelete.type === "file") {
+        await deleteFile(itemToDelete.id);
+      } else {
+        await deleteFolder(itemToDelete.id);
+      }
+
+      const updatedFolder = await getVaultFolder(id);
+      setFolder(updatedFolder);
+
+      setShowDeleteDialog(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete item:", error);
+    }
   };
 
   const handleGoBack = () => {
@@ -163,11 +199,9 @@ export default function VaultFolderPage() {
             className={`group flex items-center gap-2 ${
               item.type === "folder" ? "cursor-pointer" : ""
             }`}
+            onClick={() => item.type === "folder" && handleOpenFolder(item.id)}
           >
-            <div
-              onClick={() => item.type === "folder" && handleOpenFolder(item.id)}
-              className="flex-1"
-            >
+            <div className="flex-1">
               <Item variant="outline" className="hover:bg-accent p-3 transition-colors">
                 <ItemMedia variant="icon" className="text-blue-500">
                   {item.type === "folder" ? (
@@ -185,14 +219,24 @@ export default function VaultFolderPage() {
                 <ItemActions>
                   {item.type === "file" && (
                     <Button
-                      onClick={() => handleDownloadFile(item)}
+                      onClick={(e) => handleDownloadFile(item, e)}
                       variant="outline"
                       size="icon"
                       className="opacity-0 transition-opacity group-hover:opacity-100"
+                      title="Скачать файл"
                     >
                       <Download className="h-4 w-4" />
                     </Button>
                   )}
+                  <Button
+                    onClick={(e) => handleDeleteItem(item, e)}
+                    variant="outline"
+                    size="icon"
+                    className="text-red-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-700"
+                    title={`Удалить ${item.type === "file" ? "файл" : "папку"}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </ItemActions>
               </Item>
             </div>
@@ -304,6 +348,27 @@ export default function VaultFolderPage() {
           <div className="flex gap-3">
             <AlertDialogCancel>Отменить</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmUpload}>Перезаписать файлы</AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogTitle>
+            Удалить {itemToDelete?.type === "file" ? "файл" : "папку"}?
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Вы уверены, что хотите удалить "{itemToDelete?.name}"? Это действие невозможно отменить.
+          </AlertDialogDescription>
+          <div className="flex gap-3">
+            <AlertDialogCancel>Отменить</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Удалить
+            </AlertDialogAction>
           </div>
         </AlertDialogContent>
       </AlertDialog>
