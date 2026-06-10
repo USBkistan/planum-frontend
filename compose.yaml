@@ -1,17 +1,17 @@
 services:
-  app:
-    build: .
-    container_name: frontend_server
-    command: ["npm", "run", "start"]
-    environment:
-      - NEXT_PUBLIC_BACKEND_SERVER=${NEXT_PUBLIC_BACKEND_SERVER}
-      - NEXT_PUBLIC_BACKEND_WS_SERVER=${NEXT_PUBLIC_BACKEND_WS_SERVER}
-    env_file:
-      - .env
-    ports:
-      - 3000:3000
-    deploy:
-      resources:
-        limits:
-          cpus: '${FRONTEND_CPUS}'
-          memory: ${FRONTEND_MEMORY}
+    app:
+        build: .
+        container_name: frontend_server
+        command: ["npm", "run", "start"]
+        environment:
+            - NEXT_PUBLIC_BACKEND_SERVER=${NEXT_PUBLIC_BACKEND_SERVER}
+            - NEXT_PUBLIC_BACKEND_WS_SERVER=${NEXT_PUBLIC_BACKEND_WS_SERVER}
+        env_file:
+            - .env
+        ports:
+            - 3000:3000
+        deploy:
+            resources:
+                limits:
+                    cpus: "${FRONTEND_CPUS}"
+                    memory: ${FRONTEND_MEMORY}
