@@ -103,7 +103,6 @@ export default function ChatPage() {
         socket.send(JSON.stringify(socketMessage));
       }
 
-      // setMessages((prev) => [...prev, newMessage]);
       setInputValue("");
     } catch (error) {
       console.error("Failed to send message:", error);
