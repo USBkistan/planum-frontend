@@ -10,7 +10,7 @@ import Task from "@/components/web/task";
 import TaskPopover from "@/components/web/task-popover";
 import TaskSidebar from "@/components/web/task-sidebar";
 import { wsServerUrl } from "@/services/globals";
-import { createTask, getTasks, updateTask } from "@/services/tasks";
+import { createTask, deleteTask, getTasks, updateTask } from "@/services/tasks";
 
 export default function BoardPage() {
   const [tasks, setTasks] = useState<TasksState>({
@@ -132,6 +132,19 @@ export default function BoardPage() {
     }
   };
 
+  const handleTaskDelete = async (taskId: string) => {
+    await deleteTask(taskId);
+
+    const socketMessage = {
+      type: "tasks_updated",
+      payload: {},
+    };
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(socketMessage));
+    }
+  };
+
   const renderTasksColumn = (
     groupKey: "open" | "progress" | "closed",
     groupLabel: string,
@@ -200,6 +213,7 @@ export default function BoardPage() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onTaskUpdate={handleTaskUpdate}
+        onTaskDelete={handleTaskDelete}
       />
     </>
   );

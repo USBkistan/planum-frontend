@@ -23,3 +23,7 @@ export async function createTask(title: string) {
 export async function updateTask(task: TaskData) {
     await privateApiClient.put("/tasks", { ...task });
 }
+
+export async function deleteTask(task_id: string) {
+    await privateApiClient.delete(`/tasks?task_id=${task_id}`);
+}
