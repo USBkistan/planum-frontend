@@ -1,10 +1,18 @@
 "use client";
 
-import { Folder, File, Plus, Upload, ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, File, Folder, Plus, Upload } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { VaultFolder, VaultItem } from "@/app/schemas/vault";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
@@ -20,6 +28,9 @@ export default function VaultFolderPage() {
   const [loading, setLoading] = useState(true);
   const [newFolderName, setNewFolderName] = useState("");
   const [openPopover, setOpenPopover] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
+  const [duplicateFiles, setDuplicateFiles] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -38,7 +49,7 @@ export default function VaultFolderPage() {
   }, []);
 
   if (loading || !folder) {
-    return <div className="flex h-full items-center justify-center">Loading...</div>;
+    return <div className="flex h-full items-center justify-center">Загрузка...</div>;
   }
 
   // Sort items: folders first, then files, both alphabetically
@@ -63,10 +74,36 @@ export default function VaultFolderPage() {
     setOpenPopover(null);
   };
 
+  const checkForDuplicates = (files: FileList): string[] => {
+    const duplicates: string[] = [];
+
+    Array.from(files).forEach((file) => {
+      const exists = folder?.items.some((item) => item.name === file.name && item.type === "file");
+      if (exists) {
+        duplicates.push(file.name);
+      }
+    });
+
+    return duplicates;
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
 
+    const duplicates = checkForDuplicates(files);
+
+    if (duplicates.length > 0) {
+      setDuplicateFiles(duplicates);
+      setPendingFiles(files);
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    await proceedWithUpload(files);
+  };
+
+  const proceedWithUpload = async (files: FileList) => {
     await uploadFiles(files, id);
 
     const folder = await getVaultFolder(id);
@@ -77,6 +114,15 @@ export default function VaultFolderPage() {
       fileInputRef.current.value = "";
     }
     setOpenPopover(null);
+    setShowConfirmDialog(false);
+    setPendingFiles(null);
+    setDuplicateFiles([]);
+  };
+
+  const handleConfirmUpload = async () => {
+    if (pendingFiles) {
+      await proceedWithUpload(pendingFiles);
+    }
   };
 
   const handleOpenFolder = (childFolderId: string) => {
@@ -103,7 +149,7 @@ export default function VaultFolderPage() {
   const renderEmptyList = () => {
     return (
       <div className="flex flex-1 items-center justify-center text-gray-500">
-        <p>No items in this folder</p>
+        <p>В этой папке нет элементов</p>
       </div>
     );
   };
@@ -133,7 +179,7 @@ export default function VaultFolderPage() {
                 <ItemContent className="gap-1">
                   <ItemTitle className="line-clamp-2 text-sm">{item.name}</ItemTitle>
                   <p className="text-xs text-gray-500">
-                    {item.type === "file" ? formatFileSize(item.size || 0) : "Folder"}
+                    {item.type === "file" ? formatFileSize(item.size || 0) : "Папка"}
                   </p>
                 </ItemContent>
                 <ItemActions>
@@ -150,8 +196,6 @@ export default function VaultFolderPage() {
                 </ItemActions>
               </Item>
             </div>
-
-            {/* Download Button for Files */}
           </div>
         ))}
       </div>
@@ -243,6 +287,26 @@ export default function VaultFolderPage() {
 
       {/* Items List */}
       {sortedItems.length === 0 ? renderEmptyList() : renderList()}
+
+      {/* Confirmation Dialog for Duplicate Files */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Файлы уже существуют</AlertDialogTitle>
+          <AlertDialogDescription>Следующие файлы уже существуют в папке:</AlertDialogDescription>
+          <ul className="mb-3 max-h-48 list-inside list-disc space-y-1 overflow-y-auto rounded bg-gray-50 p-3">
+            {duplicateFiles.map((fileName) => (
+              <li key={fileName} className="text-sm text-gray-700">
+                {fileName}
+              </li>
+            ))}
+          </ul>
+          <AlertDialogDescription>Хотите перезаписать эти файлы?</AlertDialogDescription>
+          <div className="flex gap-3">
+            <AlertDialogCancel>Отменить</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmUpload}>Перезаписать файлы</AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
