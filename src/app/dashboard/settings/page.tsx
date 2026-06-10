@@ -26,10 +26,9 @@ export default function SettingsPage() {
   const [name, setName] = useState("");
   const [groupCode, setGroupCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -68,7 +67,6 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       updateNameRequest(name);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       showMessage("success", "Имя успешно обновлено");
     } catch (error) {
       showMessage("error", "Не удалось обновить имя");
@@ -78,13 +76,8 @@ export default function SettingsPage() {
   };
 
   const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if (!currentPassword || !newPassword) {
       showMessage("error", "Все поля обязательны для заполнения");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      showMessage("error", "Пароли не совпадают");
       return;
     }
 
@@ -94,18 +87,16 @@ export default function SettingsPage() {
     }
 
     setLoading(true);
-    try {
-      updatePasswordRequest(newPassword);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+    const result = await updatePasswordRequest(currentPassword, newPassword);
+    setCurrentPassword("");
+    setNewPassword("");
+    console.log(result);
+    if (result) {
+      showMessage("error", result);
+    } else {
       showMessage("success", "Пароль успешно изменен");
-    } catch (error) {
-      showMessage("error", "Не удалось изменить пароль");
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const handleCopyGroupCode = async () => {
@@ -141,7 +132,6 @@ export default function SettingsPage() {
     try {
       await leaveGroupRequest();
       Cookies.remove("group_id");
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       showMessage("success", "Вы покинули группу");
       router.push("/group");
     } catch (error) {
@@ -219,39 +209,22 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* New Password */}
             <div className="space-y-2">
               <Label htmlFor="newPassword">Новый пароль</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Введите новый пароль (минимум 8 символов)"
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Подтвердить пароль</Label>
               <div className="relative">
                 <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Подтвердите новый пароль"
+                  id="newPassword"
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Введите новый пароль (минимум 8 символов)"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  onClick={() => setShowNewPassword(!showNewPassword)}
                   className="absolute top-2.5 right-3 text-gray-600"
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>

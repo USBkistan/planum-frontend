@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import { UserData, userSchema } from "@/app/schemas/user";
 
@@ -9,16 +9,25 @@ export async function getMeRequest(): Promise<UserData> {
     return userSchema.decode(data.data);
 }
 
-export async function updatePasswordRequest(new_password: string) {
-    await privateApiClient
-        .put("/users/me/password", {
+export async function updatePasswordRequest(
+    current_password: string,
+    new_password: string,
+): Promise<string | null> {
+    try {
+        await privateApiClient.put("/users/me/password", {
+            current_password: current_password,
             new_password: new_password,
-        })
-        .catch(function (error) {
-            if (error.response) {
-                console.log(error.response.status);
-            }
         });
+        return null;
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            if (error.status === 400) {
+                return "Текущий пароль не верный";
+            }
+        }
+    }
+
+    return null;
 }
 
 export async function updateNameRequest(name: string) {
