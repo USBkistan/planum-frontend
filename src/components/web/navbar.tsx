@@ -15,6 +15,11 @@ export function Navbar() {
         <Link href={"/"}>
           <h1 className="text-3xl font-bold">Planum</h1>
         </Link>
+        {isAuthenticated && (
+          <Link className={buttonVariants({ variant: "ghost" })} href={"/dashboard/board"}>
+            Доска
+          </Link>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
