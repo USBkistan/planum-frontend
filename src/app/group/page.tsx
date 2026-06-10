@@ -26,19 +26,19 @@ export default function GroupPage() {
     e.preventDefault();
 
     if (!createGroupName.trim()) {
-      showMessage("error", "Group name cannot be empty");
+      showMessage("error", "Имя группы не может быть пустым");
       return;
     }
 
     setLoading(true);
     try {
       await createGroupRequest({ name: createGroupName });
-      showMessage("success", "Group created successfully!");
+      showMessage("success", "Группа создана успешно!");
       setCreateGroupName("");
       router.push("/dashboard/board");
     } catch (error) {
       console.log(error);
-      showMessage("error", "Failed to create group");
+      showMessage("error", "Не удалось создать группу");
     } finally {
       setLoading(false);
     }
@@ -48,18 +48,18 @@ export default function GroupPage() {
     e.preventDefault();
 
     if (!joinGroupCode.trim()) {
-      showMessage("error", "Group code cannot be empty");
+      showMessage("error", "Код группы не может быть пустым");
       return;
     }
 
     setLoading(true);
     try {
       await inviteToGroupRequest({ code: joinGroupCode });
-      showMessage("success", "Successfully joined the group!");
+      showMessage("success", "Вы успешно присоединились к группе!");
       setJoinGroupCode("");
       router.push("/dashboard/board");
     } catch (error) {
-      showMessage("error", "Invalid group code or failed to join");
+      showMessage("error", "Неверный код группы или не удалось присоединиться");
     } finally {
       setLoading(false);
     }
