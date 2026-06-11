@@ -30,6 +30,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
 import { getGroupMembersRequest } from "@/services/groups";
 
 interface TaskSidebarProps {
@@ -100,7 +101,11 @@ export default function TaskSidebar({
   return (
     <>
       <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-        <SheetContent side="right" className="w-96" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <SheetContent
+          side="right"
+          className="w-full overflow-y-auto sm:max-w-3xl!"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           <SheetHeader>
             <SheetTitle>Изменить задачу</SheetTitle>
             <SheetDescription>Измените детали задачи и сохраните изменения.</SheetDescription>
@@ -165,6 +170,17 @@ export default function TaskSidebar({
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Описание</Label>
+              <Textarea
+                id="description"
+                value={editedTask.description || ""}
+                onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
+                placeholder="Введите описание задачи"
+                rows={4}
+              />
+            </div>
           </div>
 
           <div className="space-y-3 px-4 py-4">
@@ -175,15 +191,15 @@ export default function TaskSidebar({
               <Button onClick={handleSave} className="flex-1">
                 Сохранить изменения
               </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setShowDeleteDialog(true)}
+                className="w-full flex-1"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Удалить задачу
+              </Button>
             </div>
-            <Button
-              variant="destructive"
-              onClick={() => setShowDeleteDialog(true)}
-              className="w-full"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Удалить задачу
-            </Button>
           </div>
         </SheetContent>
       </Sheet>
