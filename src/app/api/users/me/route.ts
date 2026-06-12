@@ -1,13 +1,12 @@
-import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { serverUrl } from "@/services/globals";
+import { internalApiClient } from "@/services/internal";
 
 export async function GET() {
     const cookieStore = await cookies();
     const accessTokenCookie = cookieStore.get("access_token")!;
-    const { data } = await axios.get(`${serverUrl}/users/me`, {
+    const { data } = await internalApiClient.get("/users/me", {
         headers: {
             Authorization: `Bearer ${accessTokenCookie.value}`,
         },

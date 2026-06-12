@@ -23,14 +23,14 @@ export async function POST() {
     const nextResponse = NextResponse.json({ access_token }, { status: 200 });
 
     nextResponse.cookies.set("access_token", access_token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: false,
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
     });
     nextResponse.cookies.set("refresh_token", refresh_token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: false,
         sameSite: "lax",
         path: "/",

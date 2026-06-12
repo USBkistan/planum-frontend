@@ -1,25 +1,27 @@
 import axios from "axios";
-import Cookies from "js-cookie";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { serverUrl } from "./globals";
 
-export const privateApiClient = axios.create({
+export const internalApiClient = axios.create({
     baseURL: serverUrl,
     timeout: 10000,
 });
 
-privateApiClient.interceptors.request.use((config) => {
-    const token = Cookies.get("access_token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+internalApiClient.interceptors.request.use(async (config) => {
+    const cookieStore = await cookies();
+    const accessTokenCookie = cookieStore.get("access_token")!;
+    if (accessTokenCookie) {
+        config.headers.Authorization = `Bearer ${accessTokenCookie.value}`;
     }
     return config;
 });
 
-privateApiClient.interceptors.response.use(
+internalApiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
+        const cookieStore = await cookies();
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
@@ -33,14 +35,14 @@ privateApiClient.interceptors.response.use(
                 );
 
                 const newAccessToken = data.access_token;
-                // Cookies.set("access_token", newAccessToken);
+                // cookieStore.set("access_token", newAccessToken);
 
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return privateApiClient(originalRequest);
+                return internalApiClient(originalRequest);
             } catch (refreshError) {
-                Cookies.remove("access_token");
-                Cookies.remove("refresh_token");
-                Cookies.remove("group_id");
+                cookieStore.delete("access_token");
+                cookieStore.delete("refresh_token");
+                cookieStore.delete("group_id");
                 redirect("/auth/login");
             }
         }

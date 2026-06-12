@@ -1,15 +1,14 @@
-import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { serverUrl } from "@/services/globals";
+import { internalApiClient } from "@/services/internal";
 
 export async function POST(request: Request) {
     const cookieStore = await cookies();
     const accessTokenCookie = cookieStore.get("access_token")!;
     const body = await request.json();
-    const { data } = await axios.post(
-        `${serverUrl}/groups`,
+    const { data } = await internalApiClient.post(
+        "/groups",
         { ...body },
         {
             headers: {
