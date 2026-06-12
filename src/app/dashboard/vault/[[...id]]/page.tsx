@@ -82,6 +82,10 @@ export default function VaultFolderPage() {
     };
 
     fetchFolder();
+
+    return () => {
+      ws.close();
+    };
   }, []);
 
   if (loading || !folder) {

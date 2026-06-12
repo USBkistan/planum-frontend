@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 
 import { SocketMessage } from "@/app/schemas/socket";
 import { TaskData, TasksState } from "@/app/schemas/tasks";
+import { UserData } from "@/app/schemas/user";
 import { Item, ItemTitle } from "@/components/ui/item";
 import Task from "@/components/web/task";
 import TaskPopover from "@/components/web/task-popover";
 import TaskSidebar from "@/components/web/task-sidebar";
 import { wsServerUrl } from "@/services/globals";
 import { createTask, deleteTask, getTasks, updateTask } from "@/services/tasks";
+import { getMeRequest } from "@/services/user";
 
 export default function BoardPage() {
   const [tasks, setTasks] = useState<TasksState>({
@@ -19,6 +21,7 @@ export default function BoardPage() {
     closed: [],
   });
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -48,12 +51,15 @@ export default function BoardPage() {
 
     const fetchData = async () => {
       const tasksState = await getTasks();
+      const user = await getMeRequest();
       setTasks(tasksState);
+      setUser(user);
     };
 
     fetchData();
 
     return () => {
+      ws.close();
       controller.abort();
     };
   }, []);
@@ -208,13 +214,16 @@ export default function BoardPage() {
         {renderTasksColumn("progress", "В работе", tasks.inProgress)}
         {renderTasksColumn("closed", "Закрыто", tasks.closed)}
       </div>
-      <TaskSidebar
-        task={selectedTask}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        onTaskUpdate={handleTaskUpdate}
-        onTaskDelete={handleTaskDelete}
-      />
+      {user && socket && (
+        <TaskSidebar
+          user={user}
+          task={selectedTask}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          onTaskUpdate={handleTaskUpdate}
+          onTaskDelete={handleTaskDelete}
+        />
+      )}
     </>
   );
 }

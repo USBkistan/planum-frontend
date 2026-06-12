@@ -1,6 +1,15 @@
 import z from "zod";
 
 export type TaskData = z.infer<typeof taskSchema>;
+export type Comment = z.infer<typeof commentSchema>;
+export type CommentCreate = z.infer<typeof commentCreateSchema>;
+export type CommentNode = Comment & { children: CommentNode[] };
+
+export interface TasksState {
+    open: TaskData[];
+    inProgress: TaskData[];
+    closed: TaskData[];
+}
 
 export const taskSchema = z.object({
     id: z.uuidv4(),
@@ -16,8 +25,19 @@ export const taskSchema = z.object({
     updated_at: z.iso.datetime(),
 });
 
-export interface TasksState {
-    open: TaskData[];
-    inProgress: TaskData[];
-    closed: TaskData[];
-}
+export const commentSchema = z.object({
+    id: z.uuidv4(),
+    task_id: z.uuidv4(),
+    user_id: z.uuidv4(),
+    parent_id: z.uuidv4().nullable(),
+    name: z.string(),
+    text: z.string(),
+    created_at: z.iso.datetime(),
+    updated_at: z.iso.datetime(),
+});
+
+export const commentCreateSchema = z.object({
+    task_id: z.uuidv4(),
+    parent_id: z.uuidv4().nullable(),
+    text: z.string(),
+});

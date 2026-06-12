@@ -33,7 +33,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { getGroupMembersRequest } from "@/services/groups";
 
+import TaskComments from "./comments";
+
 interface TaskSidebarProps {
+  user: UserData;
   task: TaskData | null;
   isOpen: boolean;
   onClose: () => void;
@@ -42,6 +45,7 @@ interface TaskSidebarProps {
 }
 
 export default function TaskSidebar({
+  user,
   task,
   isOpen,
   onClose,
@@ -201,6 +205,7 @@ export default function TaskSidebar({
               </Button>
             </div>
           </div>
+          {editedTask && <TaskComments taskId={editedTask.id} user={user} />}
         </SheetContent>
       </Sheet>
 
