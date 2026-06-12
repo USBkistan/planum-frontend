@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { getChatMessages, sendChatMessage } from "@/services/chat";
 import { wsServerUrl } from "@/services/globals";
 import { getMeRequest } from "@/services/user";
+import { formatDatetime } from "@/lib/utils";
 
 export default function ChatPage() {
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,7 @@ export default function ChatPage() {
   const [inputValue, setInputValue] = useState("");
   const [currentUser, setCurrentUser] = useState("");
   const [currentGroup, setCurrentGroup] = useState("");
-  const [currentUserName, setCurrentIUserName] = useState("");
+  const [currentUserName, setCurrentUserName] = useState("");
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +55,7 @@ export default function ChatPage() {
         const user = await getMeRequest();
         setCurrentUser(user.id);
         setCurrentGroup(user.group_id!);
-        setCurrentIUserName(user.display_name);
+        setCurrentUserName(user.display_name);
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch chat messages:", error);
@@ -114,15 +115,6 @@ export default function ChatPage() {
       e.preventDefault();
       handleSendMessage();
     }
-  };
-
-  const formatDatetime = (date: Date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${day}.${month}.${year} ${hours}:${minutes}`;
   };
 
   const renderMessages = () => {
