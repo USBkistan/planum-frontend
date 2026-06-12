@@ -40,6 +40,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
+    Cookies.remove("group_id");
     setIsAuthenticated(false);
   };
 
