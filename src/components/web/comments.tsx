@@ -197,7 +197,7 @@ export default function TaskComments({ taskId, user }: { taskId: string; user: U
   return (
     <>
       <Card>
-        <CardTitle className="mb-4 flex items-center gap-2 text-lg font-semibold">
+        <CardTitle className="mb-4 flex items-center gap-2 px-4 text-lg font-semibold">
           <MessageSquare className="h-5 w-5" />
           Комментарии
         </CardTitle>
