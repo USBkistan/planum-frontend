@@ -205,7 +205,10 @@ export default function TaskSidebar({
               </Button>
             </div>
           </div>
-          {editedTask && <TaskComments taskId={editedTask.id} user={user} />}
+
+          <div className="space-y-6 px-4 py-4">
+            {editedTask && <TaskComments taskId={editedTask.id} user={user} />}
+          </div>
         </SheetContent>
       </Sheet>
 

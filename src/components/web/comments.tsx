@@ -8,7 +8,7 @@ import { SocketMessage } from "@/app/schemas/socket";
 import { Comment, CommentCreate, CommentNode } from "@/app/schemas/tasks";
 import { UserData } from "@/app/schemas/user";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { wsServerUrl } from "@/services/globals";
 import { buildCommentTree, createTaskComments, getTaskComments } from "@/services/tasks";
@@ -48,19 +48,17 @@ const CommentItem = ({
     <>
       <div className="mt-4">
         {/* Тело комментария */}
-        <Card className="bg-white">
+        <Card>
           <CardContent className="p-4">
             <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-gray-500" />
+                <MessageSquare className="h-4 w-4" />
                 <span className="text-sm font-semibold">{node.name}</span>
               </div>
-              <span className="text-xs text-gray-500">
-                {new Date(node.created_at).toLocaleString("ru-RU")}
-              </span>
+              <span className="text-xs">{new Date(node.created_at).toLocaleString("ru-RU")}</span>
             </div>
 
-            <p className="mb-4 text-sm text-gray-800">{node.text}</p>
+            <p className="mb-4 text-sm">{node.text}</p>
 
             <div className="flex gap-2">
               <Button
@@ -108,9 +106,7 @@ const CommentItem = ({
 
         {/* Рендер потомков с учетом глубины */}
         {node.children.length > 0 && (
-          <div
-            className={isMaxDepth ? "mt-2" : "mt-2 ml-4 border-l-2 border-gray-200 pl-4 md:ml-6"}
-          >
+          <div className={isMaxDepth ? "mt-2" : "mt-2 ml-4 border-l-2 pl-4 md:ml-6"}>
             {node.children.map((child) => (
               <CommentItem
                 key={child.id}
@@ -199,42 +195,39 @@ export default function TaskComments({ taskId, user }: { taskId: string; user: U
   const treeRoots = buildCommentTree(comments);
 
   return (
-    <div className="space-y-6 px-4 py-4">
-      <div>
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+    <>
+      <Card>
+        <CardTitle className="mb-4 flex items-center gap-2 text-lg font-semibold">
           <MessageSquare className="h-5 w-5" />
           Комментарии
-        </h3>
+        </CardTitle>
 
-        <Card>
-          <CardContent className="p-4">
-            <Textarea
-              value={mainCommentText}
-              onChange={(e) => setMainCommentText(e.target.value)}
-              placeholder="Написать комментарий..."
-              rows={3}
-              disabled={isLoading}
-            />
-            <Button
-              onClick={() => {
-                addComment(null, mainCommentText);
-                setMainCommentText("");
-              }}
-              disabled={isLoading || !mainCommentText.trim()}
-              className="mt-3"
-            >
-              <Send className="mr-2 h-4 w-4" />
-              Написать
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
+        <CardContent className="p-4">
+          <Textarea
+            value={mainCommentText}
+            onChange={(e) => setMainCommentText(e.target.value)}
+            placeholder="Написать комментарий..."
+            rows={3}
+            disabled={isLoading}
+          />
+          <Button
+            onClick={() => {
+              addComment(null, mainCommentText);
+              setMainCommentText("");
+            }}
+            disabled={isLoading || !mainCommentText.trim()}
+            className="mt-3"
+          >
+            <Send className="mr-2 h-4 w-4" />
+            Написать
+          </Button>
+        </CardContent>
+      </Card>
       <div className="space-y-4">
         {treeRoots.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 p-8 text-center">
-            <MessageSquare className="mx-auto mb-2 h-8 w-8 text-gray-400" />
-            <p className="text-sm text-gray-500">Нет комментариев.</p>
+          <div className="rounded-lg border border-dashed p-8 text-center">
+            <MessageSquare className="mx-auto mb-2 h-8 w-8" />
+            <p className="text-sm">Нет комментариев.</p>
           </div>
         ) : (
           treeRoots.map((rootNode) => (
@@ -247,6 +240,6 @@ export default function TaskComments({ taskId, user }: { taskId: string; user: U
           ))
         )}
       </div>
-    </div>
+    </>
   );
 }
